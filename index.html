@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>我的餐厅地图</title>
+    <style>
+        html, body { height: 100%; margin: 0; padding: 0; }
+        #map { width: 100vw; height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <!-- 百度地图API -->
+    <script src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=37RkgO1xJD842QrZ0AnUGHpCOYSGg3kh"></script>
+    <script>
+        // 1. 初始化地图
+        let map;
+        window.clickPoint = null;
+        window.script = null;
+        window.sucess = function(res) {
+            if (res.uii_err === 0 && res.content) {
+                var info = res.content;
+                console.log('POI geo:', info.geo);
+                var sContent = `<h4>${info.name}</h4>
+                    <div>地址：${info.addr}</div>
+                    <button id="fav-btn">收藏</button>`;
+                var infoWindow = new BMapGL.InfoWindow(sContent);
+                // 用解码后真实经纬度弹窗（如果已解码）
+                let popupPoint = null;
+                if (info.geo && typeof info.geo === 'string') {
+                    // 还未解码，先用clickPoint弹窗
+                    popupPoint = clickPoint;
+                } else if (info.geo && typeof info.geo.lng === 'number' && typeof info.geo.lat === 'number') {
+                    popupPoint = new BMapGL.Point(info.geo.lng, info.geo.lat);
+                } else {
+                    popupPoint = clickPoint;
+                }
+                map.openInfoWindow(infoWindow, popupPoint);
+                // 绑定收藏按钮事件
+                setTimeout(function() {
+                    var btn = document.getElementById('fav-btn');
+                    if (btn) {
+                        btn.onclick = function() {
+                            // 处理geo为加密字符串的情况
+                            if (typeof info.geo === 'string') {
+                                // 记录当前POI信息，供解码回调用
+                                window.decodePoiInfo = {
+                                    uid: info.uid,
+                                    name: info.name,
+                                    addr: info.addr
+                                };
+                                let url = `https://api.map.baidu.com/?qt=dec&g=${encodeURIComponent(info.geo)}&ak=37RkgO1xJD842QrZ0AnUGHpCOYSGg3kh&callback=decodeCallback`;
+                                let decodeScript = document.createElement('script');
+                                decodeScript.setAttribute('src', url);
+                                document.getElementsByTagName('head')[0].appendChild(decodeScript);
+                                btn.outerHTML = "<span style='color:#f7c948;'>正在解码...</span>";
+                                return;
+                            }
+                            // geo为对象，直接用
+                            var lng = info.geo && info.geo.lng;
+                            var lat = info.geo && info.geo.lat;
+                            if (typeof lng !== 'number' || typeof lat !== 'number') {
+                                alert('该POI没有有效的经纬度，无法收藏');
+                                return;
+                            }
+                            var poi = {
+                                uid: info.uid,
+                                name: info.name,
+                                addr: info.addr,
+                                lng: lng,
+                                lat: lat
+                            };
+                            var favs = JSON.parse(localStorage.getItem('favoritePois') || '[]');
+                            if (!favs.some(f => f.uid === poi.uid)) {
+                                favs.push(poi);
+                                localStorage.setItem('favoritePois', JSON.stringify(favs));
+                                if (!window.favoriteMarkers) window.favoriteMarkers = {};
+                                if (!window.favoriteMarkers[poi.uid]) {
+                                    var favIcon = new BMapGL.Icon(
+                                        'https://api.iconify.design/mdi:star-circle.svg?color=%23f7c948',
+                                        new BMapGL.Size(32, 32)
+                                    );
+                                    var pt = new BMapGL.Point(poi.lng, poi.lat);
+                                    var marker = new BMapGL.Marker(pt, { icon: favIcon });
+                                    map.addOverlay(marker);
+                                    window.favoriteMarkers[poi.uid] = marker;
+                                    marker.addEventListener('click', function() {
+                                        var infoHtml = `<h4>${poi.name}</h4><div>地址：${poi.addr}</div><span style='color:#f7c948;'>已收藏</span>`;
+                                        var infoWindow = new BMapGL.InfoWindow(infoHtml);
+                                        map.openInfoWindow(infoWindow, pt);
+                                    });
+                                }
+                            }
+                            btn.outerHTML = "<span style='color:#f7c948;'>已收藏</span>";
+                        }
+                    }
+                }, 100);
+            }
+        }
+        // 解码回调
+        window.decodeCallback = function(res) {
+            if (res && res.content && res.content.point) {
+                var lng = res.content.point.x;
+                var lat = res.content.point.y;
+                var poi = {
+                    uid: window.decodePoiInfo.uid,
+                    name: window.decodePoiInfo.name,
+                    addr: window.decodePoiInfo.addr,
+                    lng: lng,
+                    lat: lat
+                };
+                var favs = JSON.parse(localStorage.getItem('favoritePois') || '[]');
+                if (!favs.some(f => f.uid === poi.uid)) {
+                    favs.push(poi);
+                    localStorage.setItem('favoritePois', JSON.stringify(favs));
+                    if (!window.favoriteMarkers) window.favoriteMarkers = {};
+                    if (!window.favoriteMarkers[poi.uid]) {
+                        var favIcon = new BMapGL.Icon(
+                            'https://api.iconify.design/mdi:star-circle.svg?color=%23f7c948',
+                            new BMapGL.Size(32, 32)
+                        );
+                        var pt = new BMapGL.Point(poi.lng, poi.lat);
+                        var marker = new BMapGL.Marker(pt, { icon: favIcon });
+                        map.addOverlay(marker);
+                        window.favoriteMarkers[poi.uid] = marker;
+                        marker.addEventListener('click', function() {
+                            var infoHtml = `<h4>${poi.name}</h4><div>地址：${poi.addr}</div><span style='color:#f7c948;'>已收藏</span>`;
+                            var infoWindow = new BMapGL.InfoWindow(infoHtml);
+                            map.openInfoWindow(infoWindow, pt);
+                        });
+                    }
+                }
+            } else {
+                alert('无法解码POI经纬度');
+            }
+        }
+        function initMap() {
+            map = new BMapGL.Map("map", {enableIconClick: true});
+            map.centerAndZoom(new BMapGL.Point(116.404, 39.915), 15);
+            map.enableScrollWheelZoom(true);
+            map.setMapStyleV2({ styleId: '75a3e83ace0ff353fbf5a085935333e7' });
+            map.addEventListener('click', e => {
+                clickPoint = e.latlng;
+                const itemId = map.getIconByClickPosition(e);
+                if (itemId) {
+                    let url = "//api.map.baidu.com/?qt=inf&uid=" + itemId.uid +
+                              "&operate=mapclick&clicktype=tile&ie=utf-8&oue=1&fromproduct=jsapi&res=api&&ak=37RkgO1xJD842QrZ0AnUGHpCOYSGg3kh&callback=sucess";
+                    script = document.createElement('script');
+                    script.setAttribute('src', url);
+                    document.getElementsByTagName('head')[0].appendChild(script);
+                }
+            });
+            renderFavorites();
+        }
+        function renderFavorites() {
+            var favs = JSON.parse(localStorage.getItem('favoritePois') || '[]');
+            var favIcon = new BMapGL.Icon(
+                'https://api.iconify.design/mdi:star-circle.svg?color=%23f7c948',
+                new BMapGL.Size(32, 32)
+            );
+            if (!window.favoriteMarkers) window.favoriteMarkers = {};
+            favs.forEach(fav => {
+                if (!window.favoriteMarkers[fav.uid]) {
+                    var pt = new BMapGL.Point(fav.lng, fav.lat);
+                    var marker = new BMapGL.Marker(pt, { icon: favIcon });
+                    map.addOverlay(marker);
+                    window.favoriteMarkers[fav.uid] = marker;
+                    marker.addEventListener('click', function() {
+                        var infoHtml = `<h4>${fav.name}</h4><div>地址：${fav.addr}</div><span style='color:#f7c948;'>已收藏</span>`;
+                        var infoWindow = new BMapGL.InfoWindow(infoHtml);
+                        map.openInfoWindow(infoWindow, pt);
+                    });
+                }
+            });
+        }
+        window.onload = function() {
+            initMap();
+        }
+    </script>
+</body>
+</html> 
