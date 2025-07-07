@@ -60,7 +60,7 @@
       font-size: 16px;
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    ">清除所有收藏</button>
+    ">清除所有评分</button>
     <div id="map"></div>
     <!-- 百度地图API -->
     <script src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=37RkgO1xJD842QrZ0AnUGHpCOYSGg3kh"></script>
@@ -71,6 +71,8 @@
         window._poiMarkers = [];
         window.favoritePois = [];
         window.favoriteMarkers = {};
+        window.ratedPois = [];
+        window.ratedMarkers = {};
 
         // ===================== 地图初始化 =====================
         function initMap() {
@@ -100,7 +102,7 @@
                     window._poiMarkers.push(marker);
                 }
             }
-            renderFavoriteMarkers();
+            renderRatedMarkers();
         }
 
         // ===================== 创建普通POI marker并绑定事件 =====================
@@ -114,13 +116,16 @@
 
         // ===================== 显示POI信息窗口 =====================
         function showPoiInfoWindow(poi, marker) {
-            const isFav = window.favoritePois.some(f => f.uid === poi.uid);
-            const btnText = isFav ? '已收藏' : '收藏';
             const infoHtml = `
                 地址：${poi.address || ''}<br>
                 经度：${poi.point.lng}<br>
                 纬度：${poi.point.lat}<br>
-                <button id="fav-btn-${poi.uid}">${btnText}</button>
+                <div>
+                    <button class="rate-btn" data-rate="超爱" style="background:#FF4500;color:#fff;">超爱</button>
+                    <button class="rate-btn" data-rate="喜欢" style="background:#FFA500;color:#fff;">喜欢</button>
+                    <button class="rate-btn" data-rate="一般" style="background:#808080;color:#fff;">一般</button>
+                    <button class="rate-btn" data-rate="不会再去了" style="background:#556B2F;color:#fff;">不会再去了</button>
+                </div>
             `;
             const opts = {
                 width: 220,
@@ -129,37 +134,49 @@
             };
             const infoWindow = new BMapGL.InfoWindow(infoHtml, opts);
             map.openInfoWindow(infoWindow, poi.point);
-
-            // 用轮询方式绑定事件，确保每次都能绑定成功
+            // 轮询绑定所有评价按钮事件
             let tryCount = 0;
             const timer = setInterval(() => {
-                const btn = document.getElementById(`fav-btn-${poi.uid}`);
-                if (btn && !isFav) {
-                    btn.onclick = function() {
-                        addFavoritePoi(poi);
-                        map.closeInfoWindow();
-                        // 不再自动弹出收藏marker的信息窗口
-                        // setTimeout(() => {
-                        //     const favMarker = window.favoriteMarkers[poi.uid];
-                        //     if (favMarker) favMarkerClickHandler(poi, favMarker)();
-                        // }, 0);
-                    }
+                const btns = document.querySelectorAll('.rate-btn');
+                if (btns.length) {
+                    btns.forEach(btn => {
+                        btn.onclick = function() {
+                            const rate = btn.getAttribute('data-rate');
+                            addRatedPoi(poi, rate);
+                            map.closeInfoWindow();
+                        }
+                    });
                     clearInterval(timer);
                 }
-                // 最多尝试20次（2秒），防止死循环
                 if (++tryCount > 20) clearInterval(timer);
             }, 100);
         }
 
-        // ===================== 收藏点持久化到localStorage =====================
-        function saveFavoritesToLocal() {
-            localStorage.setItem('favoritePois', JSON.stringify(window.favoritePois));
+        // ===================== 评价点本地存储表和持久化 =====================
+        function saveRatedToLocal() {
+            localStorage.setItem('ratedPois', JSON.stringify(window.ratedPois));
         }
 
-        // ===================== 添加收藏POI =====================
-        function addFavoritePoi(poi) {
-            if (!window.favoritePois.some(f => f.uid === poi.uid)) {
-                window.favoritePois.push({
+        // ===================== 评价颜色映射和SVG生成 =====================
+        const rateColorMap = {
+            "超爱":   { drop: "#FF4500", star: "white" },
+            "喜欢":   { drop: "#FFA500", star: "white" },
+            "一般":   { drop: "#808080", star: "white" },
+            "不会再去了": { drop: "#556B2F", star: "black" }
+        };
+        function getRatedSvg(rate) {
+            const color = rateColorMap[rate] || { drop: "#FFA500", star: "white" };
+            return `<svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 40C16 40 32 24.5685 32 16C32 7.16344 24.8366 0 16 0C7.16344 0 0 7.16344 0 16C0 24.5685 16 40 16 40Z" fill="${color.drop}"/>
+                <path d="M16 8L18.47 13.53L24 14.18L20 18.24L21.24 24L16 21.24L10.76 24L12 18.24L8 14.18L13.53 13.53L16 8Z" fill="${color.star}"/>
+            </svg>`;
+        }
+
+        // ===================== 添加评价POI（支持更新） =====================
+        function addRatedPoi(poi, rate) {
+            const idx = window.ratedPois.findIndex(f => f.uid === poi.uid);
+            if (idx === -1) {
+                window.ratedPois.push({
                     uid: poi.uid,
                     title: poi.title,
                     address: poi.address,
@@ -168,25 +185,28 @@
                     city: poi.city,
                     area: poi.area,
                     tags: poi.tags,
-                    type: poi.type
+                    type: poi.type,
+                    rate: rate
                 });
-                saveFavoritesToLocal();
-                renderFavoriteMarkers();
+            } else {
+                window.ratedPois[idx].rate = rate;
             }
+            saveRatedToLocal();
+            renderRatedMarkers();
         }
 
-        // ===================== 渲染所有收藏marker =====================
-        function renderFavoriteMarkers() {
-            Object.values(window.favoriteMarkers).forEach(marker => map.removeOverlay(marker));
-            window.favoriteMarkers = {};
-            // SVG水滴+星星图标，32x40，锚点在底部
-            const svg = `<svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg"><path d="M16 40C16 40 32 24.5685 32 16C32 7.16344 24.8366 0 16 0C7.16344 0 0 7.16344 0 16C0 24.5685 16 40 16 40Z" fill="orange"/><path d="M16 8L18.47 13.53L24 14.18L20 18.24L21.24 24L16 21.24L10.76 24L12 18.24L8 14.18L13.53 13.53L16 8Z" fill="white"/></svg>`;
-            const svgUrl = 'data:image/svg+xml;base64,' + btoa(svg);
-            window.favoritePois.forEach(poi => {
+        // ===================== 渲染所有已评价POI =====================
+        function renderRatedMarkers() {
+            // 先移除所有已存在的评价marker
+            if(window.ratedMarkers) Object.values(window.ratedMarkers).forEach(marker => map.removeOverlay(marker));
+            window.ratedMarkers = {};
+            window.ratedPois.forEach(poi => {
                 if (!poi.point || typeof poi.point.lng !== 'number' || typeof poi.point.lat !== 'number') {
                     return; // 跳过无效数据
                 }
                 const pt = new BMapGL.Point(poi.point.lng, poi.point.lat);
+                const svg = getRatedSvg(poi.rate);
+                const svgUrl = 'data:image/svg+xml;base64,' + btoa(svg);
                 const icon = new BMapGL.Icon(
                     svgUrl,
                     new BMapGL.Size(32, 40),
@@ -209,44 +229,12 @@
                 });
                 marker.setLabel(label);
                 map.addOverlay(marker);
-                window.favoriteMarkers[poi.uid] = marker;
-                marker.addEventListener('click', favMarkerClickHandler(poi, marker));
+                window.ratedMarkers[poi.uid] = marker;
+                // 绑定点击事件，弹出打分窗口
+                marker.addEventListener('click', function() {
+                    showPoiInfoWindow(poi, marker);
+                });
             });
-        }
-
-        // ===================== 收藏marker点击事件处理 =====================
-        function favMarkerClickHandler(poi, marker) {
-            return function() {
-                const infoHtml = `
-                    地址：${poi.address || ''}<br>
-                    经度：${poi.point.lng}<br>
-                    纬度：${poi.point.lat}<br>
-                    <button id="fav-btn-${poi.uid}">取消收藏</button>
-                `;
-                const opts = {
-                    width: 220,
-                    height: 200,
-                    title: poi.title
-                };
-                const infoWindow = new BMapGL.InfoWindow(infoHtml, opts);
-                map.openInfoWindow(infoWindow, marker.getPosition());
-                setTimeout(() => {
-                    const btn = document.getElementById(`fav-btn-${poi.uid}`);
-                    if (btn) {
-                        btn.onclick = function() {
-                            removeFavoritePoi(poi.uid);
-                            map.closeInfoWindow();
-                        }
-                    }
-                }, 0);
-            }
-        }
-
-        // ===================== 移除收藏POI =====================
-        function removeFavoritePoi(uid) {
-            window.favoritePois = window.favoritePois.filter(f => f.uid !== uid);
-            saveFavoritesToLocal();
-            renderFavoriteMarkers();
         }
 
         // ===================== 清除普通marker =====================
@@ -272,29 +260,29 @@
                     document.getElementById('search-btn').click();
                 }
             });
-            // 清除所有收藏按钮事件
+            // 清除所有评分按钮事件
             document.getElementById('clear-favorites-btn').onclick = function() {
-                if (confirm('确定要清除所有收藏吗？')) {
-                    window.favoritePois = [];
-                    localStorage.removeItem('favoritePois');
-                    renderFavoriteMarkers();
+                if (confirm('确定要清除所有评分吗？')) {
+                    window.ratedPois = [];
+                    localStorage.removeItem('ratedPois');
+                    renderRatedMarkers();
                 }
             };
         }
 
         // ===================== 页面加载入口 =====================
         window.onload = function() {
-            // 页面加载时从localStorage读取收藏
-            const favStr = localStorage.getItem('favoritePois');
-            if (favStr) {
+            // 页面加载时从localStorage读取评价
+            const ratedStr = localStorage.getItem('ratedPois');
+            if (ratedStr) {
                 try {
-                    window.favoritePois = JSON.parse(favStr);
+                    window.ratedPois = JSON.parse(ratedStr);
                 } catch(e) {
-                    window.favoritePois = [];
+                    window.ratedPois = [];
                 }
             }
             initMap();
-            renderFavoriteMarkers();
+            renderRatedMarkers();
             bindUIEvents();
         }
     </script>
