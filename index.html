@@ -39,6 +39,277 @@
         .search-bar button:hover {
             background: #156bbd;
         }
+        
+        .info-panel {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 320px;
+            max-height: calc(100vh - 40px);
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease;
+        }
+        
+        .info-panel.collapsed {
+            transform: translateX(calc(100% - 40px));
+        }
+        
+        .info-panel.collapsed .info-panel-content {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .info-panel.collapsed .info-panel-header {
+            border-radius: 8px 0 0 8px;
+        }
+        
+        .info-panel-header {
+            background: #1b8eec;
+            color: #fff;
+            padding: 12px 16px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px 8px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .info-panel-header:hover {
+            background: #156bbd;
+        }
+        
+        .info-panel-toggle-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .info-panel.collapsed .info-panel-toggle-btn {
+            transform: rotate(180deg);
+        }
+        
+        .info-panel-handle {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 60px;
+            background: #1b8eec;
+            border-radius: 8px 0 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .info-panel.collapsed .info-panel-handle {
+            opacity: 1;
+        }
+        
+        .info-panel-handle:hover {
+            background: #156bbd;
+        }
+        
+        .info-panel-content {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .info-panel-section {
+            margin-bottom: 16px;
+        }
+        
+        .info-panel-section h3 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .info-panel-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .info-panel-item:last-child {
+            border-bottom: none;
+        }
+        
+        .info-panel-label {
+            color: #666;
+            font-size: 13px;
+        }
+        
+        .info-panel-value {
+            color: #333;
+            font-size: 13px;
+            font-weight: 500;
+            text-align: right;
+            max-width: 60%;
+        }
+        
+        .info-panel-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        
+        .info-panel-tag {
+            background: #f7c948;
+            color: #333;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 11px;
+        }
+        
+        .info-panel-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .info-panel-stat {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .info-panel-stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1b8eec;
+        }
+        
+        .info-panel-stat-label {
+            font-size: 11px;
+            color: #666;
+            margin-top: 2px;
+        }
+        
+        .info-panel-btn {
+            background: #1b8eec;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-size: 12px;
+            cursor: pointer;
+            display: inline-block;
+            text-align: center;
+            min-width: 60px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .info-panel-btn:hover {
+            background: #156bbd;
+        }
+        
+        .info-panel-btn.rate-btn:hover {
+            opacity: 0.8;
+        }
+        
+        .filter-checkbox-container {
+            display: inline-block;
+            margin-right: 8px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        
+        .filter-checkbox-container:hover {
+            background: #f0f0f0;
+        }
+        
+        .filter-checkbox-container input[type="checkbox"] {
+            margin-right: 4px;
+            cursor: pointer;
+        }
+        
+        .filter-checkbox-container span {
+            font-size: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .restaurant-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .restaurant-item {
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        
+        .restaurant-item:hover {
+            border-color: #1b8eec;
+            background: #f8f9fa;
+        }
+        
+        .restaurant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+        
+        .restaurant-name {
+            font-weight: bold;
+            font-size: 13px;
+            color: #333;
+        }
+        
+        .restaurant-rate {
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .restaurant-location {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+        
+        .restaurant-address {
+            font-size: 11px;
+            color: #999;
+            line-height: 1.3;
+        }
     </style>
 </head>
 <body>
@@ -46,35 +317,205 @@
         <input type="text" id="keyword" placeholder="请输入POI关键字，如餐厅、景点..." />
         <button id="search-btn">搜索</button>
     </div>
-    <button id="clear-favorites-btn" style="
-      position: fixed;
-      top: 80px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 2000;
-      background: #ff4d4f;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 20px;
-      font-size: 16px;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    ">清除所有评分</button>
     <div id="map"></div>
+    
+    <!-- 信息面板 -->
+    <div class="info-panel" id="info-panel">
+        <div class="info-panel-handle" id="info-panel-handle">◀</div>
+        <div class="info-panel-header" id="info-panel-header">
+            <span>信息面板</span>
+            <button class="info-panel-toggle-btn" id="info-panel-toggle-btn">◀</button>
+        </div>
+        <div class="info-panel-content" id="info-panel-content">
+            <!-- 内容将通过JavaScript动态生成 -->
+        </div>
+    </div>
     <!-- 百度地图API -->
     <script src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=37RkgO1xJD842QrZ0AnUGHpCOYSGg3kh"></script>
     <script>
-        // ===================== 全局变量 =====================
+        // ===================== 常量配置 =====================
+        const RATE_TYPES = [
+            { value: "超爱", drop: "#FF4500", star: "white" },
+            { value: "喜欢", drop: "#FFA500", star: "white" },
+            { value: "一般", drop: "#808080", star: "white" },
+            { value: "不会再去了", drop: "#556B2F", star: "black" }
+        ];
+
+        // ===================== 数据管理 =====================
         let map;
         let localSearch;
-        window._poiMarkers = [];
-        window.favoritePois = [];
-        window.favoriteMarkers = {};
         window.ratedPois = [];
         window.ratedMarkers = {};
+        window._poiMarkers = [];
 
-        // ===================== 地图初始化 =====================
+        function loadRatedPois() {
+            const ratedStr = localStorage.getItem('ratedPois');
+            if (ratedStr) {
+                try {
+                    window.ratedPois = JSON.parse(ratedStr);
+                } catch(e) {
+                    window.ratedPois = [];
+                }
+            } else {
+                window.ratedPois = [];
+            }
+        }
+        function saveRatedPois() {
+            localStorage.setItem('ratedPois', JSON.stringify(window.ratedPois));
+        }
+        function addOrUpdateRatedPoi(poi, rate) {
+            const idx = window.ratedPois.findIndex(f => f.uid === poi.uid);
+            
+            // 使用字段兼容性处理获取POI信息
+            const title = getPoiField(poi, ['title', 'name']);
+            const shortTitle = getShortTitle(title);
+            const address = getPoiField(poi, ['address', 'addr']);
+            const city = getPoiField(poi, ['city', 'cityname']);
+            const area = getPoiField(poi, ['area', 'areaname', 'district']);
+            const tags = getPoiField(poi, ['tags', 'std_tag', 'tag']) || [];
+            const phoneNumber = getPoiField(poi, ['phoneNumber', 'phone', 'tel']);
+            
+            if (idx === -1) {
+                window.ratedPois.push({
+                    uid: poi.uid,
+                    title: title,
+                    shortTitle: shortTitle,
+                    address: address,
+                    point: poi.point ? {lng: poi.point.lng, lat: poi.point.lat} : undefined,
+                    province: getPoiField(poi, ['province', 'provincename']),
+                    city: city,
+                    area: area,
+                    tags: tags,
+                    type: getPoiField(poi, ['type', 'poiType']),
+                    phoneNumber: phoneNumber,
+                    detailUrl: getPoiField(poi, ['detailUrl', 'url']),
+                    business: getPoiField(poi, ['business', 'businessArea']),
+                    provinceCode: getPoiField(poi, ['provinceCode', 'province_code']),
+                    cityCode: getPoiField(poi, ['cityCode', 'city_code']),
+                    adCode: getPoiField(poi, ['adCode', 'ad_code']),
+                    parentPoi: getPoiField(poi, ['parentPoi', 'parent_poi']),
+                    rate: rate
+                });
+            } else {
+                window.ratedPois[idx].rate = rate;
+                window.ratedPois[idx].shortTitle = shortTitle;
+                // 更新其他可能变化的字段
+                window.ratedPois[idx].title = title;
+                window.ratedPois[idx].address = address;
+                window.ratedPois[idx].city = city;
+                window.ratedPois[idx].area = area;
+                window.ratedPois[idx].tags = tags;
+                window.ratedPois[idx].phoneNumber = phoneNumber;
+            }
+            saveRatedPois();
+            renderRatedMarkers();
+            // 如果当前在列表视图，更新面板
+            if (currentView === 'list') {
+                updateInfoPanel(null, 'list');
+            }
+        }
+        function removeRatedPoi(uid) {
+            window.ratedPois = window.ratedPois.filter(f => f.uid !== uid);
+            saveRatedPois();
+            renderRatedMarkers();
+            // 如果当前在列表视图，更新面板
+            if (currentView === 'list') {
+                updateInfoPanel(null, 'list');
+            }
+        }
+
+        // ===================== 视图渲染 =====================
+        function getRatedSvg(rate) {
+            const type = RATE_TYPES.find(t => t.value === rate) || RATE_TYPES[1];
+            return `<svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 40C16 40 32 24.5685 32 16C32 7.16344 24.8366 0 16 0C7.16344 0 0 7.16344 0 16C0 24.5685 16 40 16 40Z" fill="${type.drop}"/>
+                <path d="M16 8L18.47 13.53L24 14.18L20 18.24L21.24 24L16 21.24L10.76 24L12 18.24L8 14.18L13.53 13.53L16 8Z" fill="${type.star}"/>
+            </svg>`;
+        }
+        function renderRatedMarkers() {
+            if(window.ratedMarkers) Object.values(window.ratedMarkers).forEach(marker => map.removeOverlay(marker));
+            window.ratedMarkers = {};
+            const checkedRates = getCheckedRates();
+            window.ratedPois.forEach(poi => {
+                if (!poi.point || typeof poi.point.lng !== 'number' || typeof poi.point.lat !== 'number') return;
+                if (!checkedRates.includes(poi.rate)) return;
+                const pt = new BMapGL.Point(poi.point.lng, poi.point.lat);
+                const svg = getRatedSvg(poi.rate);
+                const svgUrl = 'data:image/svg+xml;base64,' + btoa(svg);
+                const icon = new BMapGL.Icon(svgUrl, new BMapGL.Size(32, 40), { anchor: new BMapGL.Size(16, 40) });
+                const marker = new BMapGL.Marker(pt, {icon: icon});
+                const label = new BMapGL.Label(poi.shortTitle || poi.title, { offset: new BMapGL.Size(20, -10) });
+                label.setStyle({
+                    color: '#333', fontSize: '14px', background: 'rgba(255,255,255,0.85)',
+                    border: 'none', padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold', zIndex: 999
+                });
+                marker.setLabel(label);
+                map.addOverlay(marker);
+                window.ratedMarkers[poi.uid] = marker;
+                marker.addEventListener('click', function() {
+                    showPoiInfoWindow(poi, marker);
+                });
+            });
+        }
+        function clearPoiMarkers() {
+            if (window._poiMarkers) {
+                window._poiMarkers.forEach(m => map.removeOverlay(m));
+            }
+            window._poiMarkers = [];
+        }
+        function getCheckedRates() {
+            // 使用信息面板的筛选状态，如果没有则使用保存的状态
+            const infoPanelFilters = document.querySelectorAll('.list-filter:checked');
+            if (infoPanelFilters.length > 0) {
+                return Array.from(infoPanelFilters).map(cb => cb.value);
+            }
+            // 如果没有找到信息面板的筛选器，使用保存的状态
+            return Object.keys(listFilterState).filter(key => listFilterState[key]);
+        }
+        function updateMapViewportForRatedPois() {
+            if (window.ratedPois && window.ratedPois.length > 0) {
+                const points = window.ratedPois
+                    .filter(poi => poi.point && typeof poi.point.lng === 'number' && typeof poi.point.lat === 'number')
+                    .map(poi => new BMapGL.Point(poi.point.lng, poi.point.lat));
+                if (points.length > 0) {
+                    // 手动扩大边界，避免贴边
+                    let minLng = Math.min(...points.map(p => p.lng));
+                    let maxLng = Math.max(...points.map(p => p.lng));
+                    let minLat = Math.min(...points.map(p => p.lat));
+                    let maxLat = Math.max(...points.map(p => p.lat));
+                    const padding = 0.01;
+                    minLng -= padding; maxLng += padding; minLat -= padding; maxLat += padding;
+                    map.setViewport([
+                        new BMapGL.Point(minLng, minLat),
+                        new BMapGL.Point(maxLng, maxLat)
+                    ]);
+                }
+            }
+        }
+
+        // ===================== 信息窗口 =====================
+        function getPoiField(poi, fieldNames) {
+            // 支持多种可能的字段名，按优先级返回第一个存在的值
+            for (let fieldName of fieldNames) {
+                if (poi[fieldName] !== undefined && poi[fieldName] !== null && poi[fieldName] !== '') {
+                    return poi[fieldName];
+                }
+            }
+            return '';
+        }
+
+        function getShortTitle(title) {
+            if (!title) return '';
+            const idx = title.indexOf('(');
+            return idx > 0 ? title.slice(0, idx).trim() : title;
+        }
+
+        function showPoiInfoWindow(poi, marker) {
+            // 跳转到餐厅详情页面
+            updateInfoPanel(poi, 'detail');
+        }
+
+        // ===================== 地图与搜索 =====================
         function initMap() {
             map = new BMapGL.Map("map", {enableIconClick: true});
             map.centerAndZoom(new BMapGL.Point(116.404, 39.915), 12);
@@ -82,167 +523,35 @@
             map.setMapStyleV2({ styleId: '75a3e83ace0ff353fbf5a085935333e7' });
             initLocalSearch();
         }
-
-        // ===================== 本地搜索初始化 =====================
         function initLocalSearch() {
             localSearch = new BMapGL.LocalSearch(map, {
-                renderOptions: { map: null, autoViewport: true }
+                renderOptions: { map: null, autoViewport: false }
             });
             localSearch.setSearchCompleteCallback(handleSearchResults);
         }
-
-        // ===================== 处理搜索结果 =====================
         function handleSearchResults(results) {
             clearPoiMarkers();
+            const points = [];
             for (let i = 0; i < results.getCurrentNumPois(); i++) {
                 const poi = results.getPoi(i);
                 if (poi && poi.point) {
                     const marker = createPoiMarker(poi);
                     map.addOverlay(marker);
                     window._poiMarkers.push(marker);
+                    points.push(poi.point);
                 }
+            }
+            if (points.length > 0) {
+                map.setViewport(points);
             }
             renderRatedMarkers();
         }
-
-        // ===================== 创建普通POI marker并绑定事件 =====================
         function createPoiMarker(poi) {
             const marker = new BMapGL.Marker(poi.point);
             marker.addEventListener('click', function() {
                 showPoiInfoWindow(poi, marker);
             });
             return marker;
-        }
-
-        // ===================== 显示POI信息窗口 =====================
-        function showPoiInfoWindow(poi, marker) {
-            const infoHtml = `
-                地址：${poi.address || ''}<br>
-                经度：${poi.point.lng}<br>
-                纬度：${poi.point.lat}<br>
-                <div>
-                    <button class="rate-btn" data-rate="超爱" style="background:#FF4500;color:#fff;">超爱</button>
-                    <button class="rate-btn" data-rate="喜欢" style="background:#FFA500;color:#fff;">喜欢</button>
-                    <button class="rate-btn" data-rate="一般" style="background:#808080;color:#fff;">一般</button>
-                    <button class="rate-btn" data-rate="不会再去了" style="background:#556B2F;color:#fff;">不会再去了</button>
-                </div>
-            `;
-            const opts = {
-                width: 220,
-                height: 200,
-                title: poi.title
-            };
-            const infoWindow = new BMapGL.InfoWindow(infoHtml, opts);
-            map.openInfoWindow(infoWindow, poi.point);
-            // 轮询绑定所有评价按钮事件
-            let tryCount = 0;
-            const timer = setInterval(() => {
-                const btns = document.querySelectorAll('.rate-btn');
-                if (btns.length) {
-                    btns.forEach(btn => {
-                        btn.onclick = function() {
-                            const rate = btn.getAttribute('data-rate');
-                            addRatedPoi(poi, rate);
-                            map.closeInfoWindow();
-                        }
-                    });
-                    clearInterval(timer);
-                }
-                if (++tryCount > 20) clearInterval(timer);
-            }, 100);
-        }
-
-        // ===================== 评价点本地存储表和持久化 =====================
-        function saveRatedToLocal() {
-            localStorage.setItem('ratedPois', JSON.stringify(window.ratedPois));
-        }
-
-        // ===================== 评价颜色映射和SVG生成 =====================
-        const rateColorMap = {
-            "超爱":   { drop: "#FF4500", star: "white" },
-            "喜欢":   { drop: "#FFA500", star: "white" },
-            "一般":   { drop: "#808080", star: "white" },
-            "不会再去了": { drop: "#556B2F", star: "black" }
-        };
-        function getRatedSvg(rate) {
-            const color = rateColorMap[rate] || { drop: "#FFA500", star: "white" };
-            return `<svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16 40C16 40 32 24.5685 32 16C32 7.16344 24.8366 0 16 0C7.16344 0 0 7.16344 0 16C0 24.5685 16 40 16 40Z" fill="${color.drop}"/>
-                <path d="M16 8L18.47 13.53L24 14.18L20 18.24L21.24 24L16 21.24L10.76 24L12 18.24L8 14.18L13.53 13.53L16 8Z" fill="${color.star}"/>
-            </svg>`;
-        }
-
-        // ===================== 添加评价POI（支持更新） =====================
-        function addRatedPoi(poi, rate) {
-            const idx = window.ratedPois.findIndex(f => f.uid === poi.uid);
-            if (idx === -1) {
-                window.ratedPois.push({
-                    uid: poi.uid,
-                    title: poi.title,
-                    address: poi.address,
-                    point: {lng: poi.point.lng, lat: poi.point.lat},
-                    province: poi.province,
-                    city: poi.city,
-                    area: poi.area,
-                    tags: poi.tags,
-                    type: poi.type,
-                    rate: rate
-                });
-            } else {
-                window.ratedPois[idx].rate = rate;
-            }
-            saveRatedToLocal();
-            renderRatedMarkers();
-        }
-
-        // ===================== 渲染所有已评价POI =====================
-        function renderRatedMarkers() {
-            // 先移除所有已存在的评价marker
-            if(window.ratedMarkers) Object.values(window.ratedMarkers).forEach(marker => map.removeOverlay(marker));
-            window.ratedMarkers = {};
-            window.ratedPois.forEach(poi => {
-                if (!poi.point || typeof poi.point.lng !== 'number' || typeof poi.point.lat !== 'number') {
-                    return; // 跳过无效数据
-                }
-                const pt = new BMapGL.Point(poi.point.lng, poi.point.lat);
-                const svg = getRatedSvg(poi.rate);
-                const svgUrl = 'data:image/svg+xml;base64,' + btoa(svg);
-                const icon = new BMapGL.Icon(
-                    svgUrl,
-                    new BMapGL.Size(32, 40),
-                    { anchor: new BMapGL.Size(16, 40) }
-                );
-                const marker = new BMapGL.Marker(pt, {icon: icon});
-                // 添加label，内容为title，显示在右侧
-                const label = new BMapGL.Label(poi.title, {
-                    offset: new BMapGL.Size(20, -10)
-                });
-                label.setStyle({
-                    color: '#333',
-                    fontSize: '14px',
-                    background: 'rgba(255,255,255,0.85)',
-                    border: 'none',
-                    padding: '2px 8px',
-                    borderRadius: '4px',
-                    fontWeight: 'bold',
-                    zIndex: 999
-                });
-                marker.setLabel(label);
-                map.addOverlay(marker);
-                window.ratedMarkers[poi.uid] = marker;
-                // 绑定点击事件，弹出打分窗口
-                marker.addEventListener('click', function() {
-                    showPoiInfoWindow(poi, marker);
-                });
-            });
-        }
-
-        // ===================== 清除普通marker =====================
-        function clearPoiMarkers() {
-            if (window._poiMarkers) {
-                window._poiMarkers.forEach(m => map.removeOverlay(m));
-            }
-            window._poiMarkers = [];
         }
 
         // ===================== 事件绑定 =====================
@@ -260,30 +569,399 @@
                     document.getElementById('search-btn').click();
                 }
             });
-            // 清除所有评分按钮事件
-            document.getElementById('clear-favorites-btn').onclick = function() {
-                if (confirm('确定要清除所有评分吗？')) {
-                    window.ratedPois = [];
-                    localStorage.removeItem('ratedPois');
-                    renderRatedMarkers();
-                }
-            };
-        }
 
-        // ===================== 页面加载入口 =====================
-        window.onload = function() {
-            // 页面加载时从localStorage读取评价
-            const ratedStr = localStorage.getItem('ratedPois');
-            if (ratedStr) {
-                try {
-                    window.ratedPois = JSON.parse(ratedStr);
-                } catch(e) {
-                    window.ratedPois = [];
+            
+            // 信息面板收缩/展开事件绑定
+            function toggleInfoPanel() {
+                const panel = document.getElementById('info-panel');
+                const isCollapsed = panel.classList.contains('collapsed');
+                
+                if (isCollapsed) {
+                    panel.classList.remove('collapsed');
+                } else {
+                    panel.classList.add('collapsed');
                 }
             }
+            
+            // 点击标题栏或切换按钮收缩/展开面板
+            document.getElementById('info-panel-header').onclick = toggleInfoPanel;
+            document.getElementById('info-panel-toggle-btn').onclick = function(e) {
+                e.stopPropagation(); // 阻止事件冒泡
+                toggleInfoPanel();
+            };
+            
+            // 点击侧边把手展开面板
+            document.getElementById('info-panel-handle').onclick = function() {
+                document.getElementById('info-panel').classList.remove('collapsed');
+            };
+            
+            // 键盘快捷键：按 'I' 键切换信息面板
+            document.addEventListener('keydown', function(e) {
+                if (e.key.toLowerCase() === 'i' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                    e.preventDefault();
+                    toggleInfoPanel();
+                }
+            });
+            
+            // 点击地图空白处时显示餐厅列表
+            map.addEventListener('click', function(e) {
+                // 检查是否点击的是地图本身而不是marker
+                if (e.target === map || e.target === map.getContainer()) {
+                    currentPoi = null;
+                    updateInfoPanel(null, 'list');
+                }
+            });
+        }
+
+        // ===================== 信息面板功能 =====================
+        let currentPoi = null;
+        let currentView = 'list'; // 'list', 'detail', 'stats'
+        
+        function updateInfoPanel(poi = null, view = 'list') {
+            const panelContent = document.getElementById('info-panel-content');
+            
+            if (view === 'stats') {
+                // 显示统计信息
+                currentView = 'stats';
+                const stats = getRatedPoisStats();
+                panelContent.innerHTML = `
+                    <div class="info-panel-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <h3>📊 评分统计</h3>
+                            <button class="info-panel-btn" onclick="updateInfoPanel(null, 'list')">餐厅列表</button>
+                        </div>
+                        <div class="info-panel-stats">
+                            <div class="info-panel-stat">
+                                <div class="info-panel-stat-value">${stats.total}</div>
+                                <div class="info-panel-stat-label">总评分</div>
+                            </div>
+                            <div class="info-panel-stat">
+                                <div class="info-panel-stat-value">${stats.cities}</div>
+                                <div class="info-panel-stat-label">涉及城市</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-panel-section">
+                        <h3>⭐ 评分分布</h3>
+                        ${RATE_TYPES.map(type => {
+                            const count = stats.rateCounts[type.value] || 0;
+                            return `
+                                <div class="info-panel-item">
+                                    <span class="info-panel-label">${type.value}</span>
+                                    <span class="info-panel-value">${count}个</span>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    
+                    <div class="info-panel-section">
+                        <h3>🏙️ 城市分布</h3>
+                        ${Object.entries(stats.cityCounts).map(([city, count]) => `
+                            <div class="info-panel-item">
+                                <span class="info-panel-label">${city}</span>
+                                <span class="info-panel-value">${count}个</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            } else if (view === 'list') {
+                // 显示餐厅列表
+                currentView = 'list';
+                const filteredPois = getFilteredRatedPois();
+                
+                panelContent.innerHTML = `
+                    <div class="info-panel-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <h3>🍽️ 我的餐厅</h3>
+                            <button class="info-panel-btn" onclick="updateInfoPanel(null, 'stats')">统计</button>
+                        </div>
+                        
+                        <div class="info-panel-section">
+                            <h4>筛选条件</h4>
+                            <div style="margin-bottom: 12px;">
+                                ${RATE_TYPES.map(type => `
+                                    <div class="filter-checkbox-container" onclick="toggleFilter('${type.value}')">
+                                        <input type="checkbox" class="list-filter" value="${type.value}" ${listFilterState[type.value] ? 'checked' : ''} onclick="event.stopPropagation(); toggleFilter('${type.value}');">
+                                        <span>${type.value}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <button class="info-panel-btn" onclick="selectAllFilters()">全选</button>
+                                <button class="info-panel-btn" onclick="clearAllFilters()" style="margin-left: 8px;">全不选</button>
+                            </div>
+                        </div>
+                        
+                        <div class="info-panel-section">
+                            <h4>餐厅列表 (${filteredPois.length}个)</h4>
+                            <div class="restaurant-list">
+                                ${filteredPois.length > 0 ? filteredPois.map(poi => {
+                                    const rateType = RATE_TYPES.find(t => t.value === poi.rate);
+                                    return `
+                                        <div class="restaurant-item" onclick="showRestaurantDetail('${poi.uid}')">
+                                            <div class="restaurant-header">
+                                                <span class="restaurant-name">${poi.shortTitle || poi.title}</span>
+                                                <span class="restaurant-rate" style="color: ${rateType?.drop || '#666'}">${poi.rate}</span>
+                                            </div>
+                                            <div class="restaurant-location">${poi.city || ''}${poi.area ? ' · ' + poi.area : ''}</div>
+                                            <div class="restaurant-address">${poi.address || ''}</div>
+                                        </div>
+                                    `;
+                                }).join('') : '<div style="text-align: center; color: #999; padding: 20px;">暂无评分餐厅</div>'}
+                            </div>
+                            ${filteredPois.length > 0 ? `
+                            <div style="margin-top: 12px; text-align: center;">
+                                <button class="info-panel-btn" onclick="clearAllRatedPois()" style="background: #ff4d4f; color: #fff;">清除所有评分</button>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                `;
+                
+
+                
+            } else if (poi) {
+                // 显示POI详细信息
+                currentView = 'detail';
+                currentPoi = poi;
+                const title = getPoiField(poi, ['title', 'name']);
+                const shortTitle = getShortTitle(title);
+                const city = getPoiField(poi, ['city', 'cityname']);
+                const area = getPoiField(poi, ['area', 'areaname', 'district']);
+                const address = getPoiField(poi, ['address', 'addr']);
+                const phoneNumber = getPoiField(poi, ['phoneNumber', 'phone', 'tel']);
+                const tags = getPoiField(poi, ['tags', 'std_tag', 'tag']) || [];
+                const tagArray = Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t => t.trim()) : []);
+                
+                // 检查是否已评分
+                const ratedPoi = window.ratedPois.find(rp => rp.uid === poi.uid);
+                
+                panelContent.innerHTML = `
+                    <div class="info-panel-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <h3>📍 餐厅详情</h3>
+                            <button class="info-panel-btn" onclick="updateInfoPanel(null, 'list')">返回列表</button>
+                        </div>
+                        
+                        <div class="info-panel-item">
+                            <span class="info-panel-label">名称</span>
+                            <span class="info-panel-value">${shortTitle || title || ''}</span>
+                        </div>
+                        <div class="info-panel-item">
+                            <span class="info-panel-label">位置</span>
+                            <span class="info-panel-value">${city || ''}${area ? ' · ' + area : ''}</span>
+                        </div>
+                        <div class="info-panel-item">
+                            <span class="info-panel-label">地址</span>
+                            <span class="info-panel-value">${address || ''}</span>
+                        </div>
+                        ${phoneNumber ? `
+                        <div class="info-panel-item">
+                            <span class="info-panel-label">电话</span>
+                            <span class="info-panel-value">${phoneNumber}</span>
+                        </div>
+                        ` : ''}
+                        ${tagArray.length > 0 ? `
+                        <div class="info-panel-item">
+                            <span class="info-panel-label">标签</span>
+                            <div class="info-panel-tags">
+                                ${tagArray.map(tag => `<span class="info-panel-tag">${tag}</span>`).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="info-panel-section">
+                        <h3>⭐ 评分操作</h3>
+                        ${ratedPoi ? `
+                            <div class="info-panel-item">
+                                <span class="info-panel-label">当前评分</span>
+                                <span class="info-panel-value" style="color: ${RATE_TYPES.find(t => t.value === ratedPoi.rate)?.drop || '#666'}">${ratedPoi.rate}</span>
+                            </div>
+                        ` : `
+                            <div class="info-panel-item">
+                                <span class="info-panel-label">当前评分</span>
+                                <span class="info-panel-value" style="color: #999;">未评分</span>
+                            </div>
+                        `}
+                        <div style="margin-top: 12px;">
+                            ${RATE_TYPES.map(t => `
+                                <button class="info-panel-btn rate-btn" data-rate="${t.value}" style="background:${t.drop};color:${t.star === 'black' ? '#000' : '#fff'};margin-right:8px;margin-bottom:8px;">${t.value}</button>
+                            `).join('')}
+                            ${ratedPoi ? `
+                                <button class="info-panel-btn" id="remove-rate-btn" style="background:#bbb;color:#fff;margin-bottom:8px;">取消评价</button>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div class="info-panel-section">
+                        <h3>📍 坐标信息</h3>
+                        <div class="info-panel-item">
+                            <span class="info-panel-label">经度</span>
+                            <span class="info-panel-value">${poi.point ? poi.point.lng.toFixed(6) : ''}</span>
+                        </div>
+                        <div class="info-panel-item">
+                            <span class="info-panel-label">纬度</span>
+                            <span class="info-panel-value">${poi.point ? poi.point.lat.toFixed(6) : ''}</span>
+                        </div>
+                    </div>
+                `;
+                
+                // 简化：直接绑定评分按钮事件，不使用延迟
+                const rateBtns = panelContent.querySelectorAll('.rate-btn');
+                const removeBtn = panelContent.querySelector('#remove-rate-btn');
+                
+                rateBtns.forEach(btn => {
+                    btn.onclick = function() {
+                        const rate = btn.getAttribute('data-rate');
+                        addOrUpdateRatedPoi(poi, rate);
+                        updateInfoPanel(poi, 'detail'); // 刷新面板
+                    }
+                });
+                
+                if (removeBtn) {
+                    removeBtn.onclick = function() {
+                        removeRatedPoi(poi.uid);
+                        updateInfoPanel(poi, 'detail'); // 刷新面板
+                    }
+                }
+            }
+        }
+        
+        function getRatedPoisStats() {
+            const stats = {
+                total: window.ratedPois.length,
+                cities: new Set(window.ratedPois.map(p => p.city).filter(c => c)).size,
+                rateCounts: {},
+                cityCounts: {}
+            };
+            
+            window.ratedPois.forEach(poi => {
+                // 统计评分分布
+                stats.rateCounts[poi.rate] = (stats.rateCounts[poi.rate] || 0) + 1;
+                
+                // 统计城市分布
+                if (poi.city) {
+                    stats.cityCounts[poi.city] = (stats.cityCounts[poi.city] || 0) + 1;
+                }
+            });
+            
+            return stats;
+        }
+        
+        // 保存筛选器状态
+        let listFilterState = {
+            '超爱': true,
+            '喜欢': true,
+            '一般': true,
+            '不会再去了': true
+        };
+        
+        function getFilteredRatedPois() {
+            // 使用保存的状态进行筛选，不再从DOM读取
+            const checkedRates = Object.keys(listFilterState).filter(key => listFilterState[key]);
+            const filteredPois = window.ratedPois.filter(poi => checkedRates.includes(poi.rate));
+            
+            // 按照RATE_TYPES的顺序进行排序，确保与筛选器顺序一致
+            const sortedPois = filteredPois.sort((a, b) => {
+                const indexA = RATE_TYPES.findIndex(t => t.value === a.rate);
+                const indexB = RATE_TYPES.findIndex(t => t.value === b.rate);
+                return indexA - indexB;
+            });
+            
+
+            
+            return sortedPois;
+        }
+        
+        // 将函数添加到全局作用域，以便HTML中的onclick可以调用
+        window.selectAllFilters = function() {
+            // 更新保存的状态
+            RATE_TYPES.forEach(type => {
+                listFilterState[type.value] = true;
+            });
+            updateInfoPanel(null, 'list');
+            renderRatedMarkers(); // 更新地图标记
+        };
+        
+        window.clearAllFilters = function() {
+            // 更新保存的状态
+            RATE_TYPES.forEach(type => {
+                listFilterState[type.value] = false;
+            });
+            updateInfoPanel(null, 'list');
+            renderRatedMarkers(); // 更新地图标记
+        };
+        
+        window.toggleFilter = function(value) {
+            // 切换筛选器状态
+            listFilterState[value] = !listFilterState[value];
+            updateInfoPanel(null, 'list');
+            renderRatedMarkers(); // 更新地图标记
+        };
+        
+        window.showRestaurantDetail = function(uid) {
+            const poi = window.ratedPois.find(p => p.uid === uid);
+            if (poi) {
+                updateInfoPanel(poi, 'detail');
+            }
+        };
+        
+        window.clearAllRatedPois = function() {
+            if (confirm('确定要清除所有评分吗？')) {
+                window.ratedPois = [];
+                saveRatedPois();
+                renderRatedMarkers();
+                updateInfoPanel(null, 'list');
+            }
+        };
+        
+        // ===================== 辅助功能 =====================
+        // 在控制台查看评分数据
+        window.showRatedPois = function() {
+            console.log('当前评分POI列表:', window.ratedPois);
+            console.log('localStorage中的评分数据:', localStorage.getItem('ratedPois'));
+        };
+        
+        // 在控制台查看筛选器状态
+        window.showFilterState = function() {
+            console.log('筛选器状态:', listFilterState);
+            console.log('当前视图:', currentView);
+            console.log('筛选后的餐厅数量:', getFilteredRatedPois().length);
+            console.log('总餐厅数量:', window.ratedPois.length);
+        };
+        
+
+        
+        // 清理localStorage
+        window.clearLocalStorage = function() {
+            if (confirm('确定要清理localStorage中的所有数据吗？')) {
+                localStorage.clear();
+                console.log('localStorage已清理');
+            }
+        };
+        
+        // ===================== 页面入口 =====================
+        window.onload = function() {
+            loadRatedPois();
             initMap();
             renderRatedMarkers();
             bindUIEvents();
+            updateMapViewportForRatedPois();
+            
+            // 初始化信息面板，显示餐厅列表
+            updateInfoPanel(null, 'list');
+            
+            // 确保信息面板默认展开显示
+            document.getElementById('info-panel').classList.remove('collapsed');
+            
+            // 在控制台显示辅助函数
+            console.log('辅助函数已加载:');
+            console.log('- showRatedPois(): 查看评分数据');
+            console.log('- showFilterState(): 查看筛选器状态');
+            console.log('- clearLocalStorage(): 清理localStorage');
+            console.log('- 按 I 键或点击标题栏可切换信息面板显示状态');
         }
     </script>
 </body>
