@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase 连接测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 3px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Supabase 连接测试</h1>
+    
+    <div class="test-section info">
+        <h3>配置信息</h3>
+        <p>请确保已正确配置 <code>supabase_config.js</code> 文件中的 URL 和 API 密钥。</p>
+    </div>
+
+    <div class="test-section">
+        <h3>1. 测试连接</h3>
+        <button onclick="testConnection()">测试 Supabase 连接</button>
+        <div id="connection-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. 测试用户注册</h3>
+        <input type="text" id="test-nickname" placeholder="昵称" value="测试用户">
+        <input type="text" id="test-unique-id" placeholder="用户名" value="testuser">
+        <input type="password" id="test-password" placeholder="密码" value="123456">
+        <button onclick="testRegister()">测试注册</button>
+        <div id="register-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. 测试用户登录</h3>
+        <input type="text" id="login-unique-id" placeholder="用户名" value="testuser">
+        <input type="password" id="login-password" placeholder="密码" value="123456">
+        <button onclick="testLogin()">测试登录</button>
+        <div id="login-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. 测试餐厅评分</h3>
+        <button onclick="testAddReview()">添加测试评分</button>
+        <button onclick="testGetReviews()">获取用户评分</button>
+        <div id="review-result" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. 清理测试数据</h3>
+        <button onclick="cleanupTestData()">清理测试数据</button>
+        <div id="cleanup-result" class="result"></div>
+    </div>
+
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase_config.js"></script>
+    
+    <script>
+        // 初始化 Supabase 客户端
+        const supabase = window.supabase.createClient(
+            window.SUPABASE_CONFIG.URL, 
+            window.SUPABASE_CONFIG.ANON_KEY
+        );
+
+        let currentUser = null;
+
+        async function testConnection() {
+            const resultDiv = document.getElementById('connection-result');
+            try {
+                // 测试基本连接
+                const { data, error } = await supabase.from('users').select('*').limit(1);
+                
+                if (error) {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `连接失败: ${error.message}\n\n请检查：\n1. Supabase URL 和 API 密钥是否正确\n2. 数据库表是否已创建\n3. RLS 策略是否配置正确`;
+                } else {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = '✅ Supabase 连接成功！\n\n数据库表访问正常。';
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `连接错误: ${error.message}\n\n请检查网络连接和配置。`;
+            }
+        }
+
+        async function testRegister() {
+            const resultDiv = document.getElementById('register-result');
+            const nickname = document.getElementById('test-nickname').value;
+            const uniqueId = document.getElementById('test-unique-id').value;
+            const password = document.getElementById('test-password').value;
+
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .insert([
+                        {
+                            nickname: nickname,
+                            unique_id: uniqueId,
+                            password_hash: password
+                        }
+                    ])
+                    .select()
+                    .single();
+
+                if (error) {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `注册失败: ${error.message}`;
+                } else {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ 注册成功！用户ID: ${data.id}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `注册错误: ${error.message}`;
+            }
+        }
+
+        async function testLogin() {
+            const resultDiv = document.getElementById('login-result');
+            const uniqueId = document.getElementById('login-unique-id').value;
+            const password = document.getElementById('login-password').value;
+
+            try {
+                const { data, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('unique_id', uniqueId)
+                    .single();
+
+                if (error || !data) {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = '登录失败: 用户不存在';
+                    return;
+                }
+
+                if (data.password_hash !== password) {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = '登录失败: 密码错误';
+                    return;
+                }
+
+                currentUser = data;
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `✅ 登录成功！欢迎 ${data.nickname}`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `登录错误: ${error.message}`;
+            }
+        }
+
+        async function testAddReview() {
+            const resultDiv = document.getElementById('review-result');
+            
+            if (!currentUser) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请先登录';
+                return;
+            }
+
+            try {
+                const testReview = {
+                    user_id: currentUser.id,
+                    restaurant_uid: 'test-restaurant-' + Date.now(),
+                    restaurant_name: '测试餐厅',
+                    restaurant_address: '测试地址',
+                    restaurant_city: '测试城市',
+                    restaurant_area: '测试区域',
+                    rating: '喜欢',
+                    latitude: 39.915,
+                    longitude: 116.404,
+                    tags: ['测试', '餐厅']
+                };
+
+                const { data, error } = await supabase
+                    .from('restaurant_reviews')
+                    .insert([testReview])
+                    .select()
+                    .single();
+
+                if (error) {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `添加评分失败: ${error.message}`;
+                } else {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ 评分添加成功！评分ID: ${data.id}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `添加评分错误: ${error.message}`;
+            }
+        }
+
+        async function testGetReviews() {
+            const resultDiv = document.getElementById('review-result');
+            
+            if (!currentUser) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请先登录';
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('restaurant_reviews')
+                    .select('*')
+                    .eq('user_id', currentUser.id);
+
+                if (error) {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `获取评分失败: ${error.message}`;
+                } else {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✅ 获取评分成功！共 ${data.length} 条评分:\n${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `获取评分错误: ${error.message}`;
+            }
+        }
+
+        async function cleanupTestData() {
+            const resultDiv = document.getElementById('cleanup-result');
+            
+            if (!currentUser) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '请先登录';
+                return;
+            }
+
+            try {
+                // 删除测试用户的评分
+                const { error: reviewError } = await supabase
+                    .from('restaurant_reviews')
+                    .delete()
+                    .eq('user_id', currentUser.id);
+
+                if (reviewError) {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `删除评分失败: ${reviewError.message}`;
+                    return;
+                }
+
+                // 删除测试用户
+                const { error: userError } = await supabase
+                    .from('users')
+                    .delete()
+                    .eq('id', currentUser.id);
+
+                if (userError) {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `删除用户失败: ${userError.message}`;
+                    return;
+                }
+
+                currentUser = null;
+                resultDiv.className = 'result success';
+                resultDiv.textContent = '✅ 测试数据清理完成！';
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `清理数据错误: ${error.message}`;
+            }
+        }
+
+        // 页面加载时测试连接
+        window.onload = function() {
+            testConnection();
+        };
+    </script>
+</body>
+</html> 

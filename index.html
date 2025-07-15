@@ -44,8 +44,12 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            width: 320px;
-            max-height: calc(100vh - 40px);
+            width: 400px;
+            height: 680px;
+            min-width: 220px;
+            min-height: 48px;
+            max-width: 90vw;
+            max-height: 90vh;
             background: #fff;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -53,26 +57,42 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
-            transition: transform 0.3s ease;
+            margin-top: 60px; /* 为用户状态栏留出空间 */
         }
         
         .info-panel.collapsed {
-            transform: translateX(calc(100% - 40px));
+            width: 48px !important;
+            min-width: 48px !important;
+            max-width: 48px !important;
+            height: 48px !important;
+            min-height: 48px !important;
+            max-height: 48px !important;
+            background: #1b8eec !important;
         }
-        
-        .info-panel.collapsed .info-panel-content {
-            opacity: 0;
-            pointer-events: none;
-        }
-        
         .info-panel.collapsed .info-panel-header {
-            border-radius: 8px 0 0 8px;
+            background: #1b8eec !important;
+            padding: 0;
+            justify-content: flex-end;
+            width: 48px;
+        }
+        .info-panel.collapsed .info-panel-toggle-btn {
+            width: 48px;
+            height: 48px;
+            justify-content: center;
+            z-index: 1001;
+        }
+        .info-panel.collapsed .info-panel-header span {
+            display: none;
+        }
+        .info-panel.collapsed .info-panel-content {
+            display: none !important;
         }
         
         .info-panel-header {
-            background: #1b8eec;
-            color: #fff;
-            padding: 12px 16px;
+            width: 100%;
+            box-sizing: border-box;
+            height: 48px;
+            line-height: 48px;
             font-size: 16px;
             font-weight: bold;
             border-radius: 8px 8px 0 0;
@@ -80,6 +100,11 @@
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
+            padding: 0 16px;
+            background: #1b8eec;
+            color: #fff;
+            /* transition: opacity 0.2s; */
+            position: relative;
         }
         
         .info-panel-header:hover {
@@ -87,20 +112,22 @@
         }
         
         .info-panel-toggle-btn {
+            position: absolute;
+            top: 0;
+            right: 0;
             background: none;
             border: none;
             color: #fff;
-            font-size: 16px;
+            font-size: 22px;
             cursor: pointer;
             padding: 0;
-            width: 24px;
-            height: 24px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s;
         }
-        
         .info-panel.collapsed .info-panel-toggle-btn {
             transform: rotate(180deg);
         }
@@ -136,10 +163,63 @@
             padding: 16px;
             overflow-y: auto;
             flex: 1;
+            opacity: 1;
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+            /* transition: opacity 0.3s; */
+        }
+        .info-panel.collapsed .info-panel-content {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .info-panel-resizer {
+            height: 8px;
+            cursor: ns-resize;
+            background: #f0f0f0;
+            width: 100%;
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            z-index: 10;
+        }
+        .info-panel-corner-resizer {
+            width: 16px;
+            height: 16px;
+            position: absolute;
+            right: 0;
+            bottom: 0;
+            cursor: nwse-resize;
+            z-index: 11;
+            background: transparent;
+        }
+        .info-panel-corner-resizer:after {
+            display: none;
+            content: '';
+        }
+        .info-panel-corner-resizer-left {
+            width: 16px;
+            height: 16px;
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            cursor: nesw-resize;
+            z-index: 11;
+            background: transparent;
+        }
+        .info-panel-corner-resizer-left:after {
+            display: none;
+            content: '';
         }
         
         .info-panel-section {
             margin-bottom: 16px;
+        }
+        
+        .info-panel-section.flex-grow {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
         
         .info-panel-section h3 {
@@ -262,8 +342,12 @@
         }
         
         .restaurant-list {
-            max-height: 300px;
+            max-height: none;
             overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
         
         .restaurant-item {
@@ -274,6 +358,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
             user-select: none;
+            flex-shrink: 0;
         }
         
         .restaurant-item:hover {
@@ -310,6 +395,344 @@
             color: #999;
             line-height: 1.3;
         }
+        .info-panel.collapsed .info-panel-resizer,
+        .info-panel.collapsed .info-panel-corner-resizer,
+        .info-panel.collapsed .info-panel-corner-resizer-left {
+            display: none !important;
+            background: transparent !important;
+            height: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        /* 用户状态栏样式 */
+        .user-status-bar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px 0 rgba(27, 142, 236, 0.2);
+            padding: 8px 12px;
+            min-width: 120px;
+            transition: all 0.3s ease;
+        }
+        
+        .user-status-bar:hover {
+            box-shadow: 0 4px 12px 0 rgba(27, 142, 236, 0.3);
+            transform: translateY(-1px);
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .user-status-bar {
+                top: 10px;
+                right: 10px;
+                padding: 6px 8px;
+                min-width: 100px;
+            }
+            
+            .info-panel {
+                margin-top: 50px;
+                right: 10px;
+                width: calc(100vw - 20px);
+                max-width: 400px;
+            }
+            
+            .user-info {
+                gap: 4px;
+            }
+            
+            .login-btn, .register-btn {
+                padding: 4px 8px;
+                font-size: 12px;
+            }
+            
+            .logout-btn {
+                padding: 3px 6px;
+                font-size: 11px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .user-status-bar {
+                min-width: 80px;
+                padding: 4px 6px;
+            }
+            
+            .user-status-logged-out {
+                gap: 4px;
+            }
+            
+            .login-btn, .register-btn {
+                padding: 3px 6px;
+                font-size: 11px;
+            }
+            
+            .user-nickname {
+                font-size: 12px;
+            }
+            
+            /* 在超小屏幕上调整字体大小 */
+            .login-btn,
+            .register-btn,
+            .user-nickname,
+            .logout-btn {
+                font-size: 11px;
+            }
+        }
+        
+        .user-status-logged-out {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .login-btn, .register-btn {
+            font-size: 14px;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .login-btn {
+            background: #1b8eec;
+            color: #fff;
+        }
+        
+        .login-btn:hover {
+            background: #156bbd;
+        }
+        
+        .register-btn {
+            background: #28a745;
+            color: #fff;
+        }
+        
+        .register-btn:hover {
+            background: #218838;
+        }
+        
+        .user-status-logged-in {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .user-nickname {
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .logout-btn {
+            font-size: 12px;
+            padding: 4px 8px;
+            background: #dc3545;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        
+        /* 认证模态框样式 */
+        .auth-modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(2px);
+        }
+        
+        .auth-modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .auth-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .auth-modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .auth-modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+        
+        .auth-modal-close:hover {
+            background-color: #f8f9fa;
+            color: #666;
+        }
+        
+        .auth-modal-body {
+            padding: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #1b8eec;
+        }
+        
+        .form-hint {
+            display: block;
+            margin-top: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .form-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 24px;
+        }
+        
+        .auth-submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #1b8eec;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .auth-submit-btn:hover {
+            background: #156bbd;
+        }
+        
+        .auth-submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .auth-switch-btn {
+            background: none;
+            border: none;
+            color: #1b8eec;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 8px;
+        }
+        
+        .auth-switch-btn:hover {
+            color: #156bbd;
+        }
+        
+        /* 错误消息样式 */
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 4px;
+            display: none;
+        }
+        
+        .form-group.error input {
+            border-color: #dc3545;
+        }
+        
+        .form-group.error .error-message {
+            display: block;
+        }
+        
+        /* 成功消息样式 */
+        .success-message {
+            color: #28a745;
+            font-size: 14px;
+            text-align: center;
+            margin-top: 12px;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -317,22 +740,112 @@
         <input type="text" id="keyword" placeholder="请输入POI关键字，如餐厅、景点..." />
         <button id="search-btn">搜索</button>
     </div>
+    
+    <!-- 用户状态区域 -->
+    <div class="user-status-bar" id="user-status-bar">
+        <div class="user-status-logged-out" id="user-status-logged-out">
+            <button class="login-btn" id="login-btn">🔑 登录</button>
+            <button class="register-btn" id="register-btn">📝 注册</button>
+        </div>
+        <div class="user-status-logged-in" id="user-status-logged-in" style="display: none;">
+            <div class="user-info">
+                <span class="user-nickname" id="user-nickname">👤 用户昵称</span>
+                <button class="logout-btn" id="logout-btn">🚪 退出</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 登录模态框 -->
+    <div class="auth-modal" id="login-modal">
+        <div class="auth-modal-content">
+            <div class="auth-modal-header">
+                <h2>用户登录</h2>
+                <button class="auth-modal-close" id="login-modal-close">&times;</button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-unique-id">用户名</label>
+                        <input type="text" id="login-unique-id" name="unique_id" placeholder="请输入用户名" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">密码</label>
+                        <input type="password" id="login-password" name="password" placeholder="请输入密码" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="auth-submit-btn">登录</button>
+                        <button type="button" class="auth-switch-btn" id="switch-to-register">没有账号？去注册</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 注册模态框 -->
+    <div class="auth-modal" id="register-modal">
+        <div class="auth-modal-content">
+            <div class="auth-modal-header">
+                <h2>用户注册</h2>
+                <button class="auth-modal-close" id="register-modal-close">&times;</button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="register-form">
+                    <div class="form-group">
+                        <label for="register-nickname">昵称</label>
+                        <input type="text" id="register-nickname" name="nickname" placeholder="请输入昵称" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-unique-id">用户名</label>
+                        <input type="text" id="register-unique-id" name="unique_id" placeholder="请输入用户名（3-20位字母数字下划线）" required>
+                        <small class="form-hint">用户名只能包含字母、数字和下划线，长度3-20位</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">密码</label>
+                        <input type="password" id="register-password" name="password" placeholder="请输入密码" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-confirm-password">确认密码</label>
+                        <input type="password" id="register-confirm-password" name="confirm_password" placeholder="请再次输入密码" required>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="auth-submit-btn">注册</button>
+                        <button type="button" class="auth-switch-btn" id="switch-to-login">已有账号？去登录</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
     <div id="map"></div>
     
     <!-- 信息面板 -->
     <div class="info-panel" id="info-panel">
-        <div class="info-panel-handle" id="info-panel-handle">◀</div>
         <div class="info-panel-header" id="info-panel-header">
             <span>信息面板</span>
-            <button class="info-panel-toggle-btn" id="info-panel-toggle-btn">◀</button>
+            <button class="info-panel-toggle-btn" id="info-panel-toggle-btn" tabindex="-1">▲</button>
         </div>
         <div class="info-panel-content" id="info-panel-content">
             <!-- 内容将通过JavaScript动态生成 -->
         </div>
+        <div class="info-panel-resizer" id="info-panel-resizer"></div>
+        <div class="info-panel-corner-resizer" id="info-panel-corner-resizer"></div>
+        <div class="info-panel-corner-resizer-left" id="info-panel-corner-resizer-left"></div>
     </div>
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Supabase 配置 -->
+    <script src="supabase_config.js"></script>
     <!-- 百度地图API -->
     <script src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=37RkgO1xJD842QrZ0AnUGHpCOYSGg3kh"></script>
     <script>
+        // ===================== Supabase 配置 =====================
+        // 从配置文件获取 Supabase 配置
+        const SUPABASE_URL = window.SUPABASE_CONFIG.URL;
+        const SUPABASE_ANON_KEY = window.SUPABASE_CONFIG.ANON_KEY;
+        
+        // 初始化 Supabase 客户端
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
         // ===================== 常量配置 =====================
         const RATE_TYPES = [
             { value: "超爱", drop: "#FF4500", star: "white" },
@@ -340,6 +853,7 @@
             { value: "一般", drop: "#808080", star: "white" },
             { value: "不会再去了", drop: "#556B2F", star: "black" }
         ];
+        const GLOBAL_DEFAULT_ZOOM = 15; // 自动缩放默认级别
 
         // ===================== 数据管理 =====================
         let map;
@@ -347,80 +861,403 @@
         window.ratedPois = [];
         window.ratedMarkers = {};
         window._poiMarkers = [];
-
-        function loadRatedPois() {
-            const ratedStr = localStorage.getItem('ratedPois');
-            if (ratedStr) {
+        
+        // ===================== 用户认证管理 =====================
+        let currentUser = null;
+        let isLoggedIn = false;
+        
+        // 用户认证相关函数
+        function loadUserSession() {
+            const userSession = localStorage.getItem('userSession');
+            if (userSession) {
                 try {
-                    window.ratedPois = JSON.parse(ratedStr);
-                } catch(e) {
-                    window.ratedPois = [];
+                    const session = JSON.parse(userSession);
+                    // 检查会话是否过期（24小时）
+                    if (session.timestamp && (Date.now() - session.timestamp) < 24 * 60 * 60 * 1000) {
+                        currentUser = session.user;
+                        isLoggedIn = true;
+                        updateUserStatusUI();
+                        return true;
+                    } else {
+                        // 会话过期，清除
+                        localStorage.removeItem('userSession');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('userSession');
                 }
+            }
+            return false;
+        }
+        
+        function saveUserSession(user) {
+            const session = {
+                user: user,
+                timestamp: Date.now()
+            };
+            localStorage.setItem('userSession', JSON.stringify(session));
+        }
+        
+        function clearUserSession() {
+            localStorage.removeItem('userSession');
+            currentUser = null;
+            isLoggedIn = false;
+            updateUserStatusUI();
+        }
+        
+        function updateUserStatusUI() {
+            const loggedOutDiv = document.getElementById('user-status-logged-out');
+            const loggedInDiv = document.getElementById('user-status-logged-in');
+            const nicknameSpan = document.getElementById('user-nickname');
+            
+            if (isLoggedIn && currentUser) {
+                loggedOutDiv.style.display = 'none';
+                loggedInDiv.style.display = 'flex';
+                nicknameSpan.textContent = currentUser.nickname;
             } else {
+                loggedOutDiv.style.display = 'flex';
+                loggedInDiv.style.display = 'none';
+            }
+            
+            // 更新信息面板以反映登录状态变化
+            if (currentView === 'list') {
+                updateInfoPanel(null, 'list');
+            } else if (currentView === 'stats') {
+                updateInfoPanel(null, 'stats');
+            } else if (currentView === 'search' && currentSearchResults.length > 0) {
+                updateInfoPanel(null, 'search', currentSearchResults);
+            } else if (currentView === 'detail' && currentPoi) {
+                updateInfoPanel(currentPoi, 'detail');
+            }
+        }
+        
+        // Supabase 用户认证API
+        async function loginUser(uniqueId, password) {
+            try {
+                // 从数据库查询用户
+                const { data: user, error } = await supabase
+                    .from('users')
+                    .select('*')
+                    .eq('unique_id', uniqueId)
+                    .single();
+                
+                if (error || !user) {
+                    throw new Error('用户名或密码错误');
+                }
+                
+                // 验证密码（这里使用简单的比较，实际应该使用bcrypt）
+                if (user.password_hash !== password) {
+                    throw new Error('用户名或密码错误');
+                }
+                
+                // 更新最后活跃时间
+                await supabase
+                    .from('users')
+                    .update({ last_active: new Date().toISOString() })
+                    .eq('id', user.id);
+                
+                return {
+                    id: user.id,
+                    unique_id: user.unique_id,
+                    nickname: user.nickname,
+                    avatar_url: user.avatar_url
+                };
+            } catch (error) {
+                console.error('登录错误:', error);
+                throw new Error('用户名或密码错误');
+            }
+        }
+        
+        async function registerUser(nickname, uniqueId, password) {
+            try {
+                // 检查用户名是否已存在
+                const { data: existingUser, error: checkError } = await supabase
+                    .from('users')
+                    .select('id')
+                    .eq('unique_id', uniqueId)
+                    .single();
+                
+                if (existingUser) {
+                    throw new Error('用户名已存在');
+                }
+                
+                // 创建新用户（这里使用简单的密码存储，实际应该使用bcrypt哈希）
+                const { data: newUser, error } = await supabase
+                    .from('users')
+                    .insert([
+                        {
+                            nickname: nickname,
+                            unique_id: uniqueId,
+                            password_hash: password // 实际应该使用 bcrypt.hash(password, 10)
+                        }
+                    ])
+                    .select()
+                    .single();
+                
+                if (error) {
+                    console.error('注册错误:', error);
+                    throw new Error('注册失败，请重试');
+                }
+                
+                return {
+                    id: newUser.id,
+                    unique_id: newUser.unique_id,
+                    nickname: newUser.nickname,
+                    avatar_url: newUser.avatar_url
+                };
+            } catch (error) {
+                console.error('注册错误:', error);
+                throw error;
+            }
+        }
+        
+        // 表单验证函数
+        function validateUniqueId(uniqueId) {
+            const pattern = /^[a-zA-Z0-9_]{3,20}$/;
+            return pattern.test(uniqueId);
+        }
+        
+        function validatePassword(password) {
+            return password && password.length >= 6;
+        }
+        
+        function validateNickname(nickname) {
+            return nickname && nickname.trim().length >= 2;
+        }
+        
+        // 显示错误消息
+        function showFormError(formGroup, message) {
+            formGroup.classList.add('error');
+            let errorDiv = formGroup.querySelector('.error-message');
+            if (!errorDiv) {
+                errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                formGroup.appendChild(errorDiv);
+            }
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+        
+        // 清除错误消息
+        function clearFormError(formGroup) {
+            formGroup.classList.remove('error');
+            const errorDiv = formGroup.querySelector('.error-message');
+            if (errorDiv) {
+                errorDiv.style.display = 'none';
+            }
+        }
+        
+        // 显示成功消息
+        function showSuccessMessage(modal, message) {
+            let successDiv = modal.querySelector('.success-message');
+            if (!successDiv) {
+                successDiv = document.createElement('div');
+                successDiv.className = 'success-message';
+                modal.querySelector('.auth-modal-body').appendChild(successDiv);
+            }
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+        
+        // 模态框管理
+        function showModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'block';
+            // 清除之前的错误和成功消息
+            modal.querySelectorAll('.error-message, .success-message').forEach(el => {
+                el.style.display = 'none';
+            });
+            modal.querySelectorAll('.form-group').forEach(el => {
+                el.classList.remove('error');
+            });
+        }
+        
+        function hideModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.style.display = 'none';
+        }
+        
+        function switchModal(fromModalId, toModalId) {
+            hideModal(fromModalId);
+            showModal(toModalId);
+        }
+
+        async function loadRatedPois() {
+            if (!isLoggedIn || !currentUser) {
+                window.ratedPois = [];
+                return;
+            }
+            
+            try {
+                const { data: reviews, error } = await supabase
+                    .from('restaurant_reviews')
+                    .select('*')
+                    .eq('user_id', currentUser.id);
+                
+                if (error) {
+                    console.error('加载评分数据错误:', error);
+                    window.ratedPois = [];
+                    return;
+                }
+                
+                // 将数据库格式转换为应用格式
+                window.ratedPois = reviews.map(review => ({
+                    uid: review.restaurant_uid,
+                    title: review.restaurant_name,
+                    shortTitle: getShortTitle(review.restaurant_name),
+                    address: review.restaurant_address,
+                    point: review.longitude && review.latitude ? {
+                        lng: review.longitude,
+                        lat: review.latitude
+                    } : undefined,
+                    city: review.restaurant_city,
+                    area: review.restaurant_area,
+                    tags: review.tags || [],
+                    phoneNumber: null, // 数据库中没有存储
+                    rate: review.rating,
+                    // 添加数据库字段
+                    review_id: review.id,
+                    review_text: review.review_text,
+                    is_public: review.is_public,
+                    created_at: review.created_at,
+                    updated_at: review.updated_at
+                }));
+            } catch (error) {
+                console.error('加载评分数据错误:', error);
                 window.ratedPois = [];
             }
         }
-        function saveRatedPois() {
-            localStorage.setItem('ratedPois', JSON.stringify(window.ratedPois));
-        }
-        function addOrUpdateRatedPoi(poi, rate) {
-            const idx = window.ratedPois.findIndex(f => f.uid === poi.uid);
-            
-            // 使用字段兼容性处理获取POI信息
-            const title = getPoiField(poi, ['title', 'name']);
-            const shortTitle = getShortTitle(title);
-            const address = getPoiField(poi, ['address', 'addr']);
-            const city = getPoiField(poi, ['city', 'cityname']);
-            const area = getPoiField(poi, ['area', 'areaname', 'district']);
-            const tags = getPoiField(poi, ['tags', 'std_tag', 'tag']) || [];
-            const phoneNumber = getPoiField(poi, ['phoneNumber', 'phone', 'tel']);
-            
-            if (idx === -1) {
-                window.ratedPois.push({
-                    uid: poi.uid,
-                    title: title,
-                    shortTitle: shortTitle,
-                    address: address,
-                    point: poi.point ? {lng: poi.point.lng, lat: poi.point.lat} : undefined,
-                    province: getPoiField(poi, ['province', 'provincename']),
-                    city: city,
-                    area: area,
-                    tags: tags,
-                    type: getPoiField(poi, ['type', 'poiType']),
-                    phoneNumber: phoneNumber,
-                    detailUrl: getPoiField(poi, ['detailUrl', 'url']),
-                    business: getPoiField(poi, ['business', 'businessArea']),
-                    provinceCode: getPoiField(poi, ['provinceCode', 'province_code']),
-                    cityCode: getPoiField(poi, ['cityCode', 'city_code']),
-                    adCode: getPoiField(poi, ['adCode', 'ad_code']),
-                    parentPoi: getPoiField(poi, ['parentPoi', 'parent_poi']),
-                    rate: rate
-                });
-            } else {
-                window.ratedPois[idx].rate = rate;
-                window.ratedPois[idx].shortTitle = shortTitle;
-                // 更新其他可能变化的字段
-                window.ratedPois[idx].title = title;
-                window.ratedPois[idx].address = address;
-                window.ratedPois[idx].city = city;
-                window.ratedPois[idx].area = area;
-                window.ratedPois[idx].tags = tags;
-                window.ratedPois[idx].phoneNumber = phoneNumber;
+        
+        async function saveRatedPoi(poi, rate) {
+            if (!isLoggedIn || !currentUser) {
+                throw new Error('用户未登录');
             }
-            saveRatedPois();
-            renderRatedMarkers();
-            // 如果当前在列表视图，更新面板
-            if (currentView === 'list') {
-                updateInfoPanel(null, 'list');
+            
+            try {
+                const reviewData = {
+                    user_id: currentUser.id,
+                    restaurant_uid: poi.uid,
+                    restaurant_name: getPoiField(poi, ['title', 'name']),
+                    restaurant_address: getPoiField(poi, ['address', 'addr']),
+                    restaurant_city: getPoiField(poi, ['city', 'cityname']),
+                    restaurant_area: getPoiField(poi, ['area', 'areaname', 'district']),
+                    rating: rate,
+                    latitude: poi.point ? parseFloat(poi.point.lat) : null,
+                    longitude: poi.point ? parseFloat(poi.point.lng) : null,
+                    tags: Array.isArray(getPoiField(poi, ['tags', 'std_tag', 'tag'])) 
+                        ? getPoiField(poi, ['tags', 'std_tag', 'tag']) 
+                        : []
+                };
+                
+                console.log('保存评分数据:', reviewData);
+                
+                const { data, error } = await supabase
+                    .from('restaurant_reviews')
+                    .upsert(reviewData, { 
+                        onConflict: 'user_id,restaurant_uid'
+                    })
+                    .select()
+                    .single();
+                
+                if (error) {
+                    console.error('保存评分错误:', error);
+                    throw new Error(`保存评分失败: ${error.message}`);
+                }
+                
+                return data;
+            } catch (error) {
+                console.error('保存评分错误:', error);
+                throw error;
             }
         }
-        function removeRatedPoi(uid) {
-            window.ratedPois = window.ratedPois.filter(f => f.uid !== uid);
-            saveRatedPois();
-            renderRatedMarkers();
-            // 如果当前在列表视图，更新面板
-            if (currentView === 'list') {
-                updateInfoPanel(null, 'list');
+        async function addOrUpdateRatedPoi(poi, rate) {
+            // 检查用户是否已登录
+            if (!isLoggedIn) {
+                showModal('login-modal');
+                return;
+            }
+            
+            try {
+                // 保存到Supabase
+                const savedReview = await saveRatedPoi(poi, rate);
+                
+                // 更新本地数据
+                const idx = window.ratedPois.findIndex(f => f.uid === poi.uid);
+                const title = getPoiField(poi, ['title', 'name']);
+                const shortTitle = getShortTitle(title);
+                const address = getPoiField(poi, ['address', 'addr']);
+                const city = getPoiField(poi, ['city', 'cityname']);
+                const area = getPoiField(poi, ['area', 'areaname', 'district']);
+                const tags = getPoiField(poi, ['tags', 'std_tag', 'tag']) || [];
+                
+                if (idx === -1) {
+                    // 新增评分
+                    window.ratedPois.push({
+                        uid: poi.uid,
+                        title: title,
+                        shortTitle: shortTitle,
+                        address: address,
+                        point: poi.point ? {lng: poi.point.lng, lat: poi.point.lat} : undefined,
+                        city: city,
+                        area: area,
+                        tags: tags,
+                        rate: rate,
+                        review_id: savedReview.id,
+                        created_at: savedReview.created_at,
+                        updated_at: savedReview.updated_at
+                    });
+                } else {
+                    // 更新评分
+                    window.ratedPois[idx].rate = rate;
+                    window.ratedPois[idx].shortTitle = shortTitle;
+                    window.ratedPois[idx].title = title;
+                    window.ratedPois[idx].address = address;
+                    window.ratedPois[idx].city = city;
+                    window.ratedPois[idx].area = area;
+                    window.ratedPois[idx].tags = tags;
+                    window.ratedPois[idx].updated_at = savedReview.updated_at;
+                }
+                
+                renderRatedMarkers();
+                // 如果当前在列表视图，更新面板
+                if (currentView === 'list') {
+                    updateInfoPanel(null, 'list');
+                }
+            } catch (error) {
+                console.error('保存评分失败:', error);
+                alert('保存评分失败，请重试');
+            }
+        }
+        
+        async function removeRatedPoi(uid) {
+            // 检查用户是否已登录
+            if (!isLoggedIn) {
+                showModal('login-modal');
+                return;
+            }
+            
+            try {
+                // 从Supabase删除
+                const { error } = await supabase
+                    .from('restaurant_reviews')
+                    .delete()
+                    .eq('user_id', currentUser.id)
+                    .eq('restaurant_uid', uid);
+                
+                if (error) {
+                    console.error('删除评分错误:', error);
+                    throw new Error('删除评分失败');
+                }
+                
+                // 更新本地数据
+                window.ratedPois = window.ratedPois.filter(f => f.uid !== uid);
+                renderRatedMarkers();
+                // 如果当前在列表视图，更新面板
+                if (currentView === 'list') {
+                    updateInfoPanel(null, 'list');
+                }
+            } catch (error) {
+                console.error('删除评分失败:', error);
+                alert('删除评分失败，请重试');
             }
         }
 
@@ -518,20 +1355,23 @@
         // ===================== 地图与搜索 =====================
         function initMap() {
             map = new BMapGL.Map("map", {enableIconClick: true});
-            map.centerAndZoom(new BMapGL.Point(116.404, 39.915), 12);
+            map.centerAndZoom(new BMapGL.Point(116.404, 39.915), GLOBAL_DEFAULT_ZOOM);
             map.enableScrollWheelZoom(true);
             map.setMapStyleV2({ styleId: '75a3e83ace0ff353fbf5a085935333e7' });
+            // 不再设置最大缩放，用户可手动放大
             initLocalSearch();
         }
         function initLocalSearch() {
             localSearch = new BMapGL.LocalSearch(map, {
-                renderOptions: { map: null, autoViewport: false }
+                renderOptions: { map: null, autoViewport: false },
+                pageCapacity: 20 // 每页20条
             });
             localSearch.setSearchCompleteCallback(handleSearchResults);
         }
         function handleSearchResults(results) {
             clearPoiMarkers();
             const points = [];
+            const searchResults = [];
             for (let i = 0; i < results.getCurrentNumPois(); i++) {
                 const poi = results.getPoi(i);
                 if (poi && poi.point) {
@@ -539,21 +1379,240 @@
                     map.addOverlay(marker);
                     window._poiMarkers.push(marker);
                     points.push(poi.point);
+                    searchResults.push(poi);
                 }
             }
             if (points.length > 0) {
                 map.setViewport(points);
             }
             renderRatedMarkers();
+            // 分页累加
+            if (currentSearchPage === 0) {
+                currentSearchResults = searchResults;
+            } else {
+                currentSearchResults = currentSearchResults.concat(searchResults);
+            }
+            hasMoreSearchResults = searchResults.length === 20;
+            updateInfoPanel(null, 'search', currentSearchResults);
         }
         function createPoiMarker(poi) {
             const marker = new BMapGL.Marker(poi.point);
+            // 将POI数据存储到marker中，方便后续获取
+            marker._poiData = poi;
             marker.addEventListener('click', function() {
                 showPoiInfoWindow(poi, marker);
             });
             return marker;
         }
 
+        // ===================== 认证事件绑定 =====================
+        function bindAuthEvents() {
+            // 登录按钮点击事件
+            document.getElementById('login-btn').addEventListener('click', () => {
+                showModal('login-modal');
+            });
+            
+            // 注册按钮点击事件
+            document.getElementById('register-btn').addEventListener('click', () => {
+                showModal('register-modal');
+            });
+            
+            // 退出登录按钮点击事件
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                if (confirm('确定要退出登录吗？')) {
+                    clearUserSession();
+                    // 清空评分数据
+                    window.ratedPois = [];
+                    renderRatedMarkers();
+                    updateMapViewportForRatedPois();
+                    updateInfoPanel(null, 'list');
+                    
+                    // 显示退出提示
+                    if (currentView === 'list') {
+                        const panelContent = document.getElementById('info-panel-content');
+                        const logoutDiv = document.createElement('div');
+                        logoutDiv.style.cssText = 'background: #f8d7da; color: #721c24; padding: 12px; border-radius: 6px; margin-bottom: 16px; text-align: center;';
+                        logoutDiv.textContent = '已退出登录，请重新登录才能进行评分操作。';
+                        panelContent.insertBefore(logoutDiv, panelContent.firstChild);
+                        setTimeout(() => logoutDiv.remove(), 3000);
+                    }
+                }
+            });
+            
+            // 模态框关闭按钮事件
+            document.getElementById('login-modal-close').addEventListener('click', () => {
+                hideModal('login-modal');
+            });
+            
+            document.getElementById('register-modal-close').addEventListener('click', () => {
+                hideModal('register-modal');
+            });
+            
+            // 模态框背景点击关闭
+            document.getElementById('login-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'login-modal') {
+                    hideModal('login-modal');
+                }
+            });
+            
+            document.getElementById('register-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'register-modal') {
+                    hideModal('register-modal');
+                }
+            });
+            
+            // 切换模态框按钮事件
+            document.getElementById('switch-to-register').addEventListener('click', () => {
+                switchModal('login-modal', 'register-modal');
+            });
+            
+            document.getElementById('switch-to-login').addEventListener('click', () => {
+                switchModal('register-modal', 'login-modal');
+            });
+            
+            // 登录表单提交事件
+            document.getElementById('login-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const uniqueId = document.getElementById('login-unique-id').value.trim();
+                const password = document.getElementById('login-password').value;
+                const submitBtn = e.target.querySelector('.auth-submit-btn');
+                
+                // 清除之前的错误
+                clearFormError(e.target.querySelector('.form-group'));
+                
+                // 验证输入
+                if (!uniqueId) {
+                    showFormError(e.target.querySelector('.form-group'), '请输入用户名');
+                    return;
+                }
+                
+                if (!password) {
+                    showFormError(e.target.querySelector('.form-group:last-child'), '请输入密码');
+                    return;
+                }
+                
+                // 禁用提交按钮
+                submitBtn.disabled = true;
+                submitBtn.textContent = '登录中...';
+                
+                try {
+                    const user = await loginUser(uniqueId, password);
+                    currentUser = user;
+                    isLoggedIn = true;
+                    saveUserSession(user);
+                    updateUserStatusUI();
+                    
+                    showSuccessMessage(document.getElementById('login-modal'), '登录成功！');
+                    
+                    // 延迟关闭模态框
+                    setTimeout(async () => {
+                        hideModal('login-modal');
+                        // 清空表单
+                        e.target.reset();
+                        
+                        // 加载用户评分数据
+                        await loadRatedPois();
+                        renderRatedMarkers();
+                        updateMapViewportForRatedPois();
+                        
+                        // 显示欢迎消息
+                        if (currentView === 'list') {
+                            const panelContent = document.getElementById('info-panel-content');
+                            const welcomeDiv = document.createElement('div');
+                            welcomeDiv.style.cssText = 'background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 16px; text-align: center;';
+                            welcomeDiv.textContent = `欢迎回来，${currentUser.nickname}！现在可以开始评分了。`;
+                            panelContent.insertBefore(welcomeDiv, panelContent.firstChild);
+                            setTimeout(() => welcomeDiv.remove(), 3000);
+                        }
+                    }, 1500);
+                    
+                } catch (error) {
+                    showFormError(e.target.querySelector('.form-group'), error.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '登录';
+                }
+            });
+            
+            // 注册表单提交事件
+            document.getElementById('register-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const nickname = document.getElementById('register-nickname').value.trim();
+                const uniqueId = document.getElementById('register-unique-id').value.trim();
+                const password = document.getElementById('register-password').value;
+                const confirmPassword = document.getElementById('register-confirm-password').value;
+                const submitBtn = e.target.querySelector('.auth-submit-btn');
+                
+                // 清除之前的错误
+                e.target.querySelectorAll('.form-group').forEach(el => clearFormError(el));
+                
+                // 验证输入
+                if (!validateNickname(nickname)) {
+                    showFormError(e.target.querySelector('.form-group'), '昵称至少需要2个字符');
+                    return;
+                }
+                
+                if (!validateUniqueId(uniqueId)) {
+                    showFormError(e.target.querySelectorAll('.form-group')[1], '用户名格式不正确（3-20位字母数字下划线）');
+                    return;
+                }
+                
+                if (!validatePassword(password)) {
+                    showFormError(e.target.querySelectorAll('.form-group')[2], '密码至少需要6个字符');
+                    return;
+                }
+                
+                if (password !== confirmPassword) {
+                    showFormError(e.target.querySelectorAll('.form-group')[3], '两次输入的密码不一致');
+                    return;
+                }
+                
+                // 禁用提交按钮
+                submitBtn.disabled = true;
+                submitBtn.textContent = '注册中...';
+                
+                try {
+                    const user = await registerUser(nickname, uniqueId, password);
+                    currentUser = user;
+                    isLoggedIn = true;
+                    saveUserSession(user);
+                    updateUserStatusUI();
+                    
+                    showSuccessMessage(document.getElementById('register-modal'), '注册成功！');
+                    
+                    // 延迟关闭模态框
+                    setTimeout(async () => {
+                        hideModal('register-modal');
+                        // 清空表单
+                        e.target.reset();
+                        
+                        // 加载用户评分数据
+                        await loadRatedPois();
+                        renderRatedMarkers();
+                        updateMapViewportForRatedPois();
+                        
+                        // 显示欢迎消息
+                        if (currentView === 'list') {
+                            const panelContent = document.getElementById('info-panel-content');
+                            const welcomeDiv = document.createElement('div');
+                            welcomeDiv.style.cssText = 'background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 16px; text-align: center;';
+                            welcomeDiv.textContent = `欢迎加入，${currentUser.nickname}！现在可以开始评分了。`;
+                            panelContent.insertBefore(welcomeDiv, panelContent.firstChild);
+                            setTimeout(() => welcomeDiv.remove(), 3000);
+                        }
+                    }, 1500);
+                    
+                } catch (error) {
+                    showFormError(e.target.querySelectorAll('.form-group')[1], error.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '注册';
+                }
+            });
+        }
+        
         // ===================== 事件绑定 =====================
         function bindUIEvents() {
             document.getElementById('search-btn').onclick = function() {
@@ -562,6 +1621,10 @@
                     alert('请输入搜索关键字');
                     return;
                 }
+                currentSearchPage = 0;
+                currentSearchKeyword = keyword;
+                currentSearchResults = [];
+                hasMoreSearchResults = false;
                 localSearch.search(keyword);
             };
             document.getElementById('keyword').addEventListener('keydown', function(e) {
@@ -569,55 +1632,146 @@
                     document.getElementById('search-btn').click();
                 }
             });
-
             
             // 信息面板收缩/展开事件绑定
             function toggleInfoPanel() {
                 const panel = document.getElementById('info-panel');
+                const btn = document.getElementById('info-panel-toggle-btn');
                 const isCollapsed = panel.classList.contains('collapsed');
-                
                 if (isCollapsed) {
                     panel.classList.remove('collapsed');
+                    // btn.innerText 不再切换
+                    panel.style.height = (panel._lastHeight || 600) + 'px';
+                    panel.style.width = (panel._lastWidth || 400) + 'px';
                 } else {
+                    panel._lastHeight = panel.offsetHeight;
+                    panel._lastWidth = panel.offsetWidth;
                     panel.classList.add('collapsed');
+                    // btn.innerText 不再切换
+                    panel.style.height = '48px';
+                    panel.style.width = '48px';
                 }
             }
-            
-            // 点击标题栏或切换按钮收缩/展开面板
             document.getElementById('info-panel-header').onclick = toggleInfoPanel;
-            document.getElementById('info-panel-toggle-btn').onclick = function(e) {
-                e.stopPropagation(); // 阻止事件冒泡
-                toggleInfoPanel();
-            };
-            
-            // 点击侧边把手展开面板
-            document.getElementById('info-panel-handle').onclick = function() {
-                document.getElementById('info-panel').classList.remove('collapsed');
-            };
-            
-            // 键盘快捷键：按 'I' 键切换信息面板
-            document.addEventListener('keydown', function(e) {
-                if (e.key.toLowerCase() === 'i' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+            // 下边拉伸
+            (function() {
+                const panel = document.getElementById('info-panel');
+                const resizer = document.getElementById('info-panel-resizer');
+                let startY, startHeight, dragging = false;
+                resizer.addEventListener('mousedown', function(e) {
+                    if (panel.classList.contains('collapsed')) return;
+                    dragging = true;
+                    startY = e.clientY;
+                    startHeight = panel.offsetHeight;
+                    document.body.style.userSelect = 'none';
+                });
+                window.addEventListener('mousemove', function(e) {
+                    if (!dragging) return;
+                    let newHeight = startHeight + (e.clientY - startY);
+                    newHeight = Math.max(120, Math.min(newHeight, window.innerHeight * 0.9));
+                    panel.style.height = newHeight + 'px';
+                    panel._lastHeight = newHeight;
+                });
+                window.addEventListener('mouseup', function() {
+                    if (dragging) {
+                        dragging = false;
+                        document.body.style.userSelect = '';
+                    }
+                });
+            })();
+            // 右下角拉伸
+            (function() {
+                const panel = document.getElementById('info-panel');
+                const resizer = document.getElementById('info-panel-corner-resizer');
+                let startY, startX, startHeight, startWidth, dragging = false;
+                resizer.addEventListener('mousedown', function(e) {
+                    if (panel.classList.contains('collapsed')) return;
+                    dragging = true;
+                    startY = e.clientY;
+                    startX = e.clientX;
+                    startHeight = panel.offsetHeight;
+                    startWidth = panel.offsetWidth;
+                    document.body.style.userSelect = 'none';
                     e.preventDefault();
-                    toggleInfoPanel();
-                }
-            });
+                });
+                window.addEventListener('mousemove', function(e) {
+                    if (!dragging) return;
+                    let newHeight = startHeight + (e.clientY - startY);
+                    let newWidth = startWidth + (e.clientX - startX);
+                    newHeight = Math.max(120, Math.min(newHeight, window.innerHeight * 0.9));
+                    newWidth = Math.max(220, Math.min(newWidth, window.innerWidth * 0.9));
+                    panel.style.height = newHeight + 'px';
+                    panel.style.width = newWidth + 'px';
+                    panel._lastHeight = newHeight;
+                    panel._lastWidth = newWidth;
+                });
+                window.addEventListener('mouseup', function() {
+                    if (dragging) {
+                        dragging = false;
+                        document.body.style.userSelect = '';
+                    }
+                });
+            })();
+            // 左下角拉伸
+            (function() {
+                const panel = document.getElementById('info-panel');
+                const resizer = document.getElementById('info-panel-corner-resizer-left');
+                let startY, startX, startHeight, startWidth, dragging = false;
+                resizer.addEventListener('mousedown', function(e) {
+                    if (panel.classList.contains('collapsed')) return;
+                    dragging = true;
+                    startY = e.clientY;
+                    startX = e.clientX;
+                    startHeight = panel.offsetHeight;
+                    startWidth = panel.offsetWidth;
+                    document.body.style.userSelect = 'none';
+                    e.preventDefault();
+                });
+                window.addEventListener('mousemove', function(e) {
+                    if (!dragging) return;
+                    let newHeight = startHeight + (e.clientY - startY);
+                    let newWidth = startWidth - (e.clientX - startX);
+                    newHeight = Math.max(120, Math.min(newHeight, window.innerHeight * 0.9));
+                    newWidth = Math.max(220, Math.min(newWidth, window.innerWidth * 0.9));
+                    panel.style.height = newHeight + 'px';
+                    panel.style.width = newWidth + 'px';
+                    panel._lastHeight = newHeight;
+                    panel._lastWidth = newWidth;
+                });
+                window.addEventListener('mouseup', function() {
+                    if (dragging) {
+                        dragging = false;
+                        document.body.style.userSelect = '';
+                    }
+                });
+            })();
             
             // 点击地图空白处时显示餐厅列表
             map.addEventListener('click', function(e) {
                 // 检查是否点击的是地图本身而不是marker
                 if (e.target === map || e.target === map.getContainer()) {
                     currentPoi = null;
-                    updateInfoPanel(null, 'list');
+                    // 如果当前有搜索结果，显示搜索结果；否则显示餐厅列表
+                    if (currentView === 'search' && currentSearchResults.length > 0) {
+                        updateInfoPanel(null, 'search', currentSearchResults);
+                    } else {
+                        updateInfoPanel(null, 'list');
+                    }
                 }
             });
         }
-
+        
         // ===================== 信息面板功能 =====================
         let currentPoi = null;
-        let currentView = 'list'; // 'list', 'detail', 'stats'
+        let currentView = 'list'; // 'list', 'detail', 'stats', 'search'
+        let currentSearchResults = []; // 存储当前搜索结果
+        let previousView = 'list'; // 存储之前的视图状态
+        let currentSearchKeyword = '';
+        let currentSearchPage = 0;
+        let hasMoreSearchResults = false;
         
-        function updateInfoPanel(poi = null, view = 'list') {
+        // ===================== 视图渲染 =====================
+        function updateInfoPanel(poi = null, view = 'list', searchResults = []) {
             const panelContent = document.getElementById('info-panel-content');
             
             if (view === 'stats') {
@@ -627,7 +1781,7 @@
                 panelContent.innerHTML = `
                     <div class="info-panel-section">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <h3>📊 评分统计</h3>
+                            <h3>📊 ${isLoggedIn ? '我的评分统计' : '评分统计'}</h3>
                             <button class="info-panel-btn" onclick="updateInfoPanel(null, 'list')">餐厅列表</button>
                         </div>
                         <div class="info-panel-stats">
@@ -665,6 +1819,50 @@
                         `).join('')}
                     </div>
                 `;
+            } else if (view === 'search') {
+                // 显示搜索结果
+                currentView = 'search';
+                currentSearchResults = searchResults; // 保存当前搜索结果
+                const keyword = currentSearchKeyword || document.getElementById('keyword').value.trim();
+                panelContent.innerHTML = `
+                    <div class="info-panel-section">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <h3>🔍 搜索结果</h3>
+                            <div>
+                                <button class="info-panel-btn" onclick="goToMyRestaurants()">${isLoggedIn ? '我的餐厅' : '餐厅评分'}</button>
+                            </div>
+                        </div>
+                        <h4>关键词: "${keyword}" (${searchResults.length}个结果)</h4>
+                    </div>
+                    <div class="info-panel-section flex-grow">
+                        <div class="restaurant-list">
+                            ${searchResults.length > 0 ? searchResults.map(poi => {
+                                const title = getPoiField(poi, ['title', 'name']);
+                                const shortTitle = getShortTitle(title);
+                                const city = getPoiField(poi, ['city', 'cityname']);
+                                const area = getPoiField(poi, ['area', 'areaname', 'district']);
+                                const address = getPoiField(poi, ['address', 'addr']);
+                                const ratedPoi = window.ratedPois.find(rp => rp.uid === poi.uid);
+                                const rateType = ratedPoi ? RATE_TYPES.find(t => t.value === ratedPoi.rate) : null;
+                                return `
+                                    <div class="restaurant-item" onclick="showSearchResultDetail('${poi.uid}')">
+                                        <div class="restaurant-header">
+                                            <span class="restaurant-name">${shortTitle || title || ''}</span>
+                                            ${ratedPoi ? `<span class="restaurant-rate" style="color: ${rateType?.drop || '#666'}">${ratedPoi.rate}</span>` : ''}
+                                        </div>
+                                        <div class="restaurant-location">${city || ''}${area ? ' · ' + area : ''}</div>
+                                        <div class="restaurant-address">${address || ''}</div>
+                                    </div>
+                                `;
+                            }).join('') : '<div style="text-align: center; color: #999; padding: 20px;">未找到相关结果</div>'}
+                        </div>
+                        ${hasMoreSearchResults ? `
+                        <div style="margin-top: 12px; text-align: center;">
+                            <button class="info-panel-btn" onclick="loadMoreSearchResults()" style="background: #52c41a; color: #fff;">加载更多结果</button>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
             } else if (view === 'list') {
                 // 显示餐厅列表
                 currentView = 'list';
@@ -673,7 +1871,7 @@
                 panelContent.innerHTML = `
                     <div class="info-panel-section">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                            <h3>🍽️ 我的餐厅</h3>
+                            <h3>🍽️ ${isLoggedIn ? '我的餐厅' : '餐厅评分'}</h3>
                             <button class="info-panel-btn" onclick="updateInfoPanel(null, 'stats')">统计</button>
                         </div>
                         
@@ -712,7 +1910,11 @@
                             </div>
                             ${filteredPois.length > 0 ? `
                             <div style="margin-top: 12px; text-align: center;">
-                                <button class="info-panel-btn" onclick="clearAllRatedPois()" style="background: #ff4d4f; color: #fff;">清除所有评分</button>
+                                ${!isLoggedIn ? `
+                                    <button class="info-panel-btn" onclick="showModal('login-modal')" style="background: #1b8eec; color: #fff;">登录后管理评分</button>
+                                ` : `
+                                    <button class="info-panel-btn" onclick="clearAllRatedPois()" style="background: #ff4d4f; color: #fff;">清除所有评分</button>
+                                `}
                             </div>
                             ` : ''}
                         </div>
@@ -722,7 +1924,12 @@
 
                 
             } else if (poi) {
+                // 选定餐厅自动缩放到对应位置
+                if (poi.point) {
+                    map.centerAndZoom(new BMapGL.Point(poi.point.lng, poi.point.lat), GLOBAL_DEFAULT_ZOOM);
+                }
                 // 显示POI详细信息
+                previousView = currentView; // 保存之前的视图
                 currentView = 'detail';
                 currentPoi = poi;
                 const title = getPoiField(poi, ['title', 'name']);
@@ -741,7 +1948,7 @@
                     <div class="info-panel-section">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <h3>📍 餐厅详情</h3>
-                            <button class="info-panel-btn" onclick="updateInfoPanel(null, 'list')">返回列表</button>
+                            <button class="info-panel-btn" onclick="goBackFromDetail()">返回</button>
                         </div>
                         
                         <div class="info-panel-item">
@@ -774,25 +1981,32 @@
                     
                     <div class="info-panel-section">
                         <h3>⭐ 评分操作</h3>
-                        ${ratedPoi ? `
-                            <div class="info-panel-item">
-                                <span class="info-panel-label">当前评分</span>
-                                <span class="info-panel-value" style="color: ${RATE_TYPES.find(t => t.value === ratedPoi.rate)?.drop || '#666'}">${ratedPoi.rate}</span>
+                        ${!isLoggedIn ? `
+                            <div style="text-align: center; padding: 20px; background: #f8f9fa; border-radius: 8px; margin-bottom: 12px;">
+                                <div style="color: #666; margin-bottom: 12px;">请先登录才能进行评分</div>
+                                <button class="info-panel-btn" onclick="showModal('login-modal')" style="background: #1b8eec; color: #fff;">立即登录</button>
                             </div>
                         ` : `
-                            <div class="info-panel-item">
-                                <span class="info-panel-label">当前评分</span>
-                                <span class="info-panel-value" style="color: #999;">未评分</span>
+                            ${ratedPoi ? `
+                                <div class="info-panel-item">
+                                    <span class="info-panel-label">当前评分</span>
+                                    <span class="info-panel-value" style="color: ${RATE_TYPES.find(t => t.value === ratedPoi.rate)?.drop || '#666'}">${ratedPoi.rate}</span>
+                                </div>
+                            ` : `
+                                <div class="info-panel-item">
+                                    <span class="info-panel-label">当前评分</span>
+                                    <span class="info-panel-value" style="color: #999;">未评分</span>
+                                </div>
+                            `}
+                            <div style="margin-top: 12px;">
+                                ${RATE_TYPES.map(t => `
+                                    <button class="info-panel-btn rate-btn" data-rate="${t.value}" style="background:${t.drop};color:${t.star === 'black' ? '#000' : '#fff'};margin-right:8px;margin-bottom:8px;">${t.value}</button>
+                                `).join('')}
+                                ${ratedPoi ? `
+                                    <button class="info-panel-btn" id="remove-rate-btn" style="background:#bbb;color:#fff;margin-bottom:8px;">取消评价</button>
+                                ` : ''}
                             </div>
                         `}
-                        <div style="margin-top: 12px;">
-                            ${RATE_TYPES.map(t => `
-                                <button class="info-panel-btn rate-btn" data-rate="${t.value}" style="background:${t.drop};color:${t.star === 'black' ? '#000' : '#fff'};margin-right:8px;margin-bottom:8px;">${t.value}</button>
-                            `).join('')}
-                            ${ratedPoi ? `
-                                <button class="info-panel-btn" id="remove-rate-btn" style="background:#bbb;color:#fff;margin-bottom:8px;">取消评价</button>
-                            ` : ''}
-                        </div>
                     </div>
                     
                     <div class="info-panel-section">
@@ -814,6 +2028,10 @@
                 
                 rateBtns.forEach(btn => {
                     btn.onclick = function() {
+                        if (!isLoggedIn) {
+                            showModal('login-modal');
+                            return;
+                        }
                         const rate = btn.getAttribute('data-rate');
                         addOrUpdateRatedPoi(poi, rate);
                         updateInfoPanel(poi, 'detail'); // 刷新面板
@@ -822,6 +2040,10 @@
                 
                 if (removeBtn) {
                     removeBtn.onclick = function() {
+                        if (!isLoggedIn) {
+                            showModal('login-modal');
+                            return;
+                        }
                         removeRatedPoi(poi.uid);
                         updateInfoPanel(poi, 'detail'); // 刷新面板
                     }
@@ -908,13 +2130,72 @@
             }
         };
         
-        window.clearAllRatedPois = function() {
+        window.clearAllRatedPois = async function() {
+            // 检查用户是否已登录
+            if (!isLoggedIn) {
+                showModal('login-modal');
+                return;
+            }
+            
             if (confirm('确定要清除所有评分吗？')) {
-                window.ratedPois = [];
-                saveRatedPois();
-                renderRatedMarkers();
+                try {
+                    // 从Supabase删除所有评分
+                    const { error } = await supabase
+                        .from('restaurant_reviews')
+                        .delete()
+                        .eq('user_id', currentUser.id);
+                    
+                    if (error) {
+                        console.error('清除所有评分错误:', error);
+                        alert('清除评分失败，请重试');
+                        return;
+                    }
+                    
+                    // 更新本地数据
+                    window.ratedPois = [];
+                    renderRatedMarkers();
+                    updateInfoPanel(null, 'list');
+                } catch (error) {
+                    console.error('清除所有评分失败:', error);
+                    alert('清除评分失败，请重试');
+                }
+            }
+        };
+        
+        window.showSearchResultDetail = function(uid) {
+            // 从当前搜索结果中查找对应的POI
+            const poi = currentSearchResults.find(p => p.uid === uid);
+            if (poi) {
+                updateInfoPanel(poi, 'detail');
+            }
+        };
+        
+        window.goBackFromDetail = function() {
+            // 根据之前的视图决定返回到哪里
+            if (previousView === 'search' && currentSearchResults.length > 0) {
+                updateInfoPanel(null, 'search', currentSearchResults);
+            } else {
                 updateInfoPanel(null, 'list');
             }
+        };
+        
+        window.loadMoreSearchResults = function() {
+            currentSearchPage++;
+            localSearch.gotoPage(currentSearchPage);
+        };
+        
+        window.goToMyRestaurants = function() {
+            // 清空搜索相关状态
+            currentSearchResults = [];
+            currentSearchKeyword = '';
+            currentSearchPage = 0;
+            hasMoreSearchResults = false;
+            // 清除地图上的搜索标记
+            clearPoiMarkers();
+            // 重置到显示所有评分餐厅的视图范围
+            updateMapViewportForRatedPois();
+            // 信息面板回到餐厅列表
+            updateInfoPanel(null, 'list');
         };
         
         // ===================== 辅助功能 =====================
@@ -943,18 +2224,39 @@
         };
         
         // ===================== 页面入口 =====================
-        window.onload = function() {
-            loadRatedPois();
+        window.onload = async function() {
+            // 加载用户会话
+            loadUserSession();
+            
+            // 初始化地图
             initMap();
-            renderRatedMarkers();
             bindUIEvents();
-            updateMapViewportForRatedPois();
+            bindAuthEvents(); // 绑定认证相关事件
+            
+            // 如果用户已登录，加载评分数据
+            if (isLoggedIn) {
+                await loadRatedPois();
+                renderRatedMarkers();
+                updateMapViewportForRatedPois();
+            }
             
             // 初始化信息面板，显示餐厅列表
             updateInfoPanel(null, 'list');
             
             // 确保信息面板默认展开显示
             document.getElementById('info-panel').classList.remove('collapsed');
+            
+            // 如果用户未登录，显示登录提示
+            if (!isLoggedIn) {
+                setTimeout(() => {
+                    const panelContent = document.getElementById('info-panel-content');
+                    const loginTipDiv = document.createElement('div');
+                    loginTipDiv.style.cssText = 'background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; margin-bottom: 16px; text-align: center;';
+                    loginTipDiv.innerHTML = '请先 <button onclick="showModal(\'login-modal\')" style="background: #1b8eec; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 0 4px;">登录</button> 或 <button onclick="showModal(\'register-modal\')" style="background: #28a745; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 0 4px;">注册</button> 后才能进行评分操作。';
+                    panelContent.insertBefore(loginTipDiv, panelContent.firstChild);
+                    setTimeout(() => loginTipDiv.remove(), 8000);
+                }, 1000);
+            }
             
             // 在控制台显示辅助函数
             console.log('辅助函数已加载:');
