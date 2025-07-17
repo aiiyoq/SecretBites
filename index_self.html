@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>我的餐厅地图</title>
+    <title>SecretBites</title>
     <style>
         html, body { height: 100%; margin: 0; padding: 0; }
         #map { width: 100vw; height: 100vh; }
@@ -447,7 +447,18 @@
             localStorage.setItem('ratedPois', JSON.stringify(window.ratedPois));
         }
         function addOrUpdateRatedPoi(poi, rate) {
-            const idx = window.ratedPois.findIndex(f => f.uid === poi.uid);
+            // 使用更精确的匹配逻辑查找现有评分
+            const idx = window.ratedPois.findIndex(f => {
+                // 优先使用 uid 匹配
+                if (f.uid === poi.uid) return true;
+                // 如果 uid 不匹配，尝试使用坐标匹配（容错处理）
+                if (f.point && poi.point) {
+                    const latDiff = Math.abs(f.point.lat - poi.point.lat);
+                    const lngDiff = Math.abs(f.point.lng - poi.point.lng);
+                    return latDiff < 0.0001 && lngDiff < 0.0001; // 约10米内的误差
+                }
+                return false;
+            });
             
             // 使用字段兼容性处理获取POI信息
             const title = getPoiField(poi, ['title', 'name']);
@@ -498,7 +509,12 @@
             }
         }
         function removeRatedPoi(uid) {
-            window.ratedPois = window.ratedPois.filter(f => f.uid !== uid);
+            // 使用更精确的匹配逻辑删除评分
+            window.ratedPois = window.ratedPois.filter(f => {
+                // 优先使用 uid 匹配
+                if (f.uid === uid) return false; // 删除匹配的项
+                return true; // 保留不匹配的项
+            });
             saveRatedPois();
             renderRatedMarkers();
             // 如果当前在列表视图，更新面板
@@ -974,8 +990,18 @@
                 const tags = getPoiField(poi, ['tags', 'std_tag', 'tag']) || [];
                 const tagArray = Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t => t.trim()) : []);
                 
-                // 检查是否已评分
-                const ratedPoi = window.ratedPois.find(rp => rp.uid === poi.uid);
+                // 检查是否已评分 - 使用更精确的匹配逻辑
+                const ratedPoi = window.ratedPois.find(rp => {
+                    // 优先使用 uid 匹配
+                    if (rp.uid === poi.uid) return true;
+                    // 如果 uid 不匹配，尝试使用坐标匹配（容错处理）
+                    if (rp.point && poi.point) {
+                        const latDiff = Math.abs(rp.point.lat - poi.point.lat);
+                        const lngDiff = Math.abs(rp.point.lng - poi.point.lng);
+                        return latDiff < 0.0001 && lngDiff < 0.0001; // 约10米内的误差
+                    }
+                    return false;
+                });
                 
                 panelContent.innerHTML = `
                     <div class="info-panel-section">

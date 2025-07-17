@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>我的餐厅地图</title>
+    <title>SecretBites</title>
     <style>
         html, body { height: 100%; margin: 0; padding: 0; }
         #map { width: 100vw; height: 100vh; }
@@ -339,6 +339,96 @@
             font-size: 12px;
             cursor: pointer;
             user-select: none;
+        }
+        
+        /* 筛选条样式 */
+        .filter-bar {
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .filter-bar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #e9ecef;
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s ease;
+        }
+        
+        .filter-bar-header:hover {
+            background: #dee2e6;
+        }
+        
+        .filter-bar-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-bar-toggle {
+            font-size: 16px;
+            color: #666;
+            transition: transform 0.3s ease;
+        }
+        
+        .filter-bar.expanded .filter-bar-toggle {
+            transform: rotate(180deg);
+        }
+        
+        .filter-bar-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .filter-bar.expanded .filter-bar-content {
+            max-height: 500px;
+        }
+        
+        .filter-section {
+            padding: 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .filter-section:last-child {
+            border-bottom: none;
+        }
+        
+        .filter-section-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .filter-section-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .filter-summary {
+            font-size: 12px;
+            color: #666;
+            margin-left: auto;
         }
         
         .restaurant-list {
@@ -1116,6 +1206,7 @@
                     rate: review.rating,
                     // 添加数据库字段
                     review_id: review.id,
+                    user_id: review.user_id, // 添加用户ID
                     review_text: review.review_text,
                     is_public: review.is_public,
                     created_at: review.created_at,
@@ -1222,6 +1313,10 @@
                 if (currentView === 'list') {
                     updateInfoPanel(null, 'list');
                 }
+                // 如果当前在详情视图且是同一个餐厅，更新详情面板
+                if (currentView === 'detail' && currentPoi && currentPoi.uid === poi.uid) {
+                    updateInfoPanel(poi, 'detail');
+                }
             } catch (error) {
                 console.error('保存评分失败:', error);
                 alert('保存评分失败，请重试');
@@ -1255,6 +1350,10 @@
                 if (currentView === 'list') {
                     updateInfoPanel(null, 'list');
                 }
+                // 如果当前在详情视图且是同一个餐厅，更新详情面板
+                if (currentView === 'detail' && currentPoi && currentPoi.uid === uid) {
+                    updateInfoPanel(currentPoi, 'detail');
+                }
             } catch (error) {
                 console.error('删除评分失败:', error);
                 alert('删除评分失败，请重试');
@@ -1272,10 +1371,12 @@
         function renderRatedMarkers() {
             if(window.ratedMarkers) Object.values(window.ratedMarkers).forEach(marker => map.removeOverlay(marker));
             window.ratedMarkers = {};
-            const checkedRates = getCheckedRates();
-            window.ratedPois.forEach(poi => {
+            
+            // 使用筛选后的数据来渲染标记
+            const filteredPois = getFilteredRatedPois();
+            
+            filteredPois.forEach(poi => {
                 if (!poi.point || typeof poi.point.lng !== 'number' || typeof poi.point.lat !== 'number') return;
-                if (!checkedRates.includes(poi.rate)) return;
                 const pt = new BMapGL.Point(poi.point.lng, poi.point.lat);
                 const svg = getRatedSvg(poi.rate);
                 const svgUrl = 'data:image/svg+xml;base64,' + btoa(svg);
@@ -1302,7 +1403,7 @@
         }
         function getCheckedRates() {
             // 使用信息面板的筛选状态，如果没有则使用保存的状态
-            const infoPanelFilters = document.querySelectorAll('.list-filter:checked');
+            const infoPanelFilters = document.querySelectorAll('.rate-filter:checked');
             if (infoPanelFilters.length > 0) {
                 return Array.from(infoPanelFilters).map(cb => cb.value);
             }
@@ -1310,8 +1411,10 @@
             return Object.keys(listFilterState).filter(key => listFilterState[key]);
         }
         function updateMapViewportForRatedPois() {
-            if (window.ratedPois && window.ratedPois.length > 0) {
-                const points = window.ratedPois
+            // 使用筛选后的数据来更新地图视口
+            const filteredPois = getFilteredRatedPois();
+            if (filteredPois && filteredPois.length > 0) {
+                const points = filteredPois
                     .filter(poi => poi.point && typeof poi.point.lng === 'number' && typeof poi.point.lat === 'number')
                     .map(poi => new BMapGL.Point(poi.point.lng, poi.point.lat));
                 if (points.length > 0) {
@@ -1423,6 +1526,9 @@
                     clearUserSession();
                     // 清空评分数据
                     window.ratedPois = [];
+                    // 重置用户筛选状态
+                    userFilterState['自己'] = null;
+                    userFilterMapping['自己'] = null;
                     renderRatedMarkers();
                     updateMapViewportForRatedPois();
                     updateInfoPanel(null, 'list');
@@ -1505,16 +1611,21 @@
                     
                     showSuccessMessage(document.getElementById('login-modal'), '登录成功！');
                     
-                    // 延迟关闭模态框
-                    setTimeout(async () => {
-                        hideModal('login-modal');
-                        // 清空表单
-                        e.target.reset();
-                        
-                        // 加载用户评分数据
-                        await loadRatedPois();
-                        renderRatedMarkers();
-                        updateMapViewportForRatedPois();
+                                            // 延迟关闭模态框
+                        setTimeout(async () => {
+                            hideModal('login-modal');
+                            // 清空表单
+                            e.target.reset();
+                            
+                            // 更新用户筛选状态
+                            userFilterState['自己'] = currentUser.id;
+                            userFilterMapping['自己'] = currentUser.id;
+                            
+                            // 加载用户评分数据
+                            await loadRatedPois();
+                            renderRatedMarkers();
+                            updateMapViewportForRatedPois();
+                            updateInfoPanel(null, 'list'); // 新增：登录后立即刷新评分列表
                         
                         // 显示欢迎消息
                         if (currentView === 'list') {
@@ -1582,16 +1693,21 @@
                     
                     showSuccessMessage(document.getElementById('register-modal'), '注册成功！');
                     
-                    // 延迟关闭模态框
-                    setTimeout(async () => {
-                        hideModal('register-modal');
-                        // 清空表单
-                        e.target.reset();
-                        
-                        // 加载用户评分数据
-                        await loadRatedPois();
-                        renderRatedMarkers();
-                        updateMapViewportForRatedPois();
+                                            // 延迟关闭模态框
+                        setTimeout(async () => {
+                            hideModal('register-modal');
+                            // 清空表单
+                            e.target.reset();
+                            
+                            // 更新用户筛选状态
+                            userFilterState['自己'] = currentUser.id;
+                            userFilterMapping['自己'] = currentUser.id;
+                            
+                            // 加载用户评分数据
+                            await loadRatedPois();
+                            renderRatedMarkers();
+                            updateMapViewportForRatedPois();
+                            updateInfoPanel(null, 'list'); // 新增：注册后立即刷新评分列表
                         
                         // 显示欢迎消息
                         if (currentView === 'list') {
@@ -1875,19 +1991,60 @@
                             <button class="info-panel-btn" onclick="updateInfoPanel(null, 'stats')">统计</button>
                         </div>
                         
-                        <div class="info-panel-section">
-                            <h4>筛选条件</h4>
-                            <div style="margin-bottom: 12px;">
-                                ${RATE_TYPES.map(type => `
-                                    <div class="filter-checkbox-container" onclick="toggleFilter('${type.value}')">
-                                        <input type="checkbox" class="list-filter" value="${type.value}" ${listFilterState[type.value] ? 'checked' : ''} onclick="event.stopPropagation(); toggleFilter('${type.value}');">
-                                        <span>${type.value}</span>
-                                    </div>
-                                `).join('')}
+                        <div class="filter-bar ${filterBarExpanded ? 'expanded' : ''}" id="filter-bar">
+                            <div class="filter-bar-header" onclick="toggleFilterBar()">
+                                <div class="filter-bar-title">
+                                    🔍 筛选条件
+                                    <span class="filter-summary">${getFilterSummary()}</span>
+                                </div>
+                                <div class="filter-bar-toggle">▼</div>
                             </div>
-                            <div style="margin-bottom: 12px;">
-                                <button class="info-panel-btn" onclick="selectAllFilters()">全选</button>
-                                <button class="info-panel-btn" onclick="clearAllFilters()" style="margin-left: 8px;">全不选</button>
+                            <div class="filter-bar-content">
+                                <div class="filter-section">
+                                    <div class="filter-section-title">
+                                        ⭐ 评分筛选
+                                    </div>
+                                    <div class="filter-section-content">
+                                        ${RATE_TYPES.map(type => `
+                                            <div class="filter-checkbox-container" onclick="toggleRateFilter('${type.value}')">
+                                                <input type="checkbox" class="rate-filter" value="${type.value}" ${listFilterState[type.value] ? 'checked' : ''} onclick="event.stopPropagation(); toggleRateFilter('${type.value}');">
+                                                <span>${type.value}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="filter-actions">
+                                        <button class="info-panel-btn" onclick="selectAllRateFilters()">全选</button>
+                                        <button class="info-panel-btn" onclick="clearAllRateFilters()">全不选</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="filter-section">
+                                    <div class="filter-section-title">
+                                        👤 用户筛选
+                                    </div>
+                                    <div class="filter-section-content">
+                                        ${Object.keys(userFilterState).map(user => `
+                                            <div class="filter-checkbox-container" onclick="toggleUserFilter('${user}')">
+                                                <input type="checkbox" class="user-filter" value="${user}" ${userFilterState[user] !== null ? 'checked' : ''} onclick="event.stopPropagation(); toggleUserFilter('${user}');">
+                                                <span>${user}</span>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                    <div class="filter-actions">
+                                        <button class="info-panel-btn" onclick="selectAllUserFilters()">全选</button>
+                                        <button class="info-panel-btn" onclick="clearAllUserFilters()">全不选</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- 预留距离筛选位置 -->
+                                <div class="filter-section" style="display: none;">
+                                    <div class="filter-section-title">
+                                        📍 距离筛选
+                                    </div>
+                                    <div class="filter-section-content">
+                                        <div style="color: #999; font-size: 12px;">距离筛选功能开发中...</div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
@@ -2027,25 +2184,23 @@
                 const removeBtn = panelContent.querySelector('#remove-rate-btn');
                 
                 rateBtns.forEach(btn => {
-                    btn.onclick = function() {
+                    btn.onclick = async function() {
                         if (!isLoggedIn) {
                             showModal('login-modal');
                             return;
                         }
                         const rate = btn.getAttribute('data-rate');
-                        addOrUpdateRatedPoi(poi, rate);
-                        updateInfoPanel(poi, 'detail'); // 刷新面板
+                        await addOrUpdateRatedPoi(poi, rate);
                     }
                 });
                 
                 if (removeBtn) {
-                    removeBtn.onclick = function() {
+                    removeBtn.onclick = async function() {
                         if (!isLoggedIn) {
                             showModal('login-modal');
                             return;
                         }
-                        removeRatedPoi(poi.uid);
-                        updateInfoPanel(poi, 'detail'); // 刷新面板
+                        await removeRatedPoi(poi.uid);
                     }
                 }
             }
@@ -2080,10 +2235,34 @@
             '不会再去了': true
         };
         
+        // 保存用户筛选器状态 - 映射显示名称到用户ID
+        let userFilterState = {
+            '自己': currentUser ? currentUser.id : null
+        };
+        
+        // 用户筛选器显示名称到用户ID的映射
+        let userFilterMapping = {
+            '自己': currentUser ? currentUser.id : null
+        };
+        
+        // 保存筛选条展开状态
+        let filterBarExpanded = false;
+        
         function getFilteredRatedPois() {
             // 使用保存的状态进行筛选，不再从DOM读取
             const checkedRates = Object.keys(listFilterState).filter(key => listFilterState[key]);
-            const filteredPois = window.ratedPois.filter(poi => checkedRates.includes(poi.rate));
+            const checkedUserIds = Object.values(userFilterState).filter(userId => userId !== null);
+            
+            // 先按评分筛选
+            let filteredPois = window.ratedPois.filter(poi => checkedRates.includes(poi.rate));
+            
+            // 再按用户ID筛选
+            if (checkedUserIds.length > 0) {
+                filteredPois = filteredPois.filter(poi => poi.user_id && checkedUserIds.includes(poi.user_id));
+            } else {
+                // 如果没有选中任何用户，则不显示任何数据
+                filteredPois = [];
+            }
             
             // 按照RATE_TYPES的顺序进行排序，确保与筛选器顺序一致
             const sortedPois = filteredPois.sort((a, b) => {
@@ -2092,36 +2271,94 @@
                 return indexA - indexB;
             });
             
-
-            
             return sortedPois;
         }
         
-        // 将函数添加到全局作用域，以便HTML中的onclick可以调用
-        window.selectAllFilters = function() {
-            // 更新保存的状态
+        // 筛选条相关函数
+        window.toggleFilterBar = function() {
+            filterBarExpanded = !filterBarExpanded;
+            const filterBar = document.getElementById('filter-bar');
+            if (filterBar) {
+                if (filterBarExpanded) {
+                    filterBar.classList.add('expanded');
+                } else {
+                    filterBar.classList.remove('expanded');
+                }
+            }
+        };
+        
+        function getFilterSummary() {
+            const checkedRates = Object.keys(listFilterState).filter(key => listFilterState[key]);
+            const checkedUsers = Object.keys(userFilterState).filter(key => userFilterState[key] !== null);
+            return `${checkedRates.length}个评分类型, ${checkedUsers.length}个用户`;
+        }
+        
+        // 评分筛选相关函数
+        window.selectAllRateFilters = function() {
             RATE_TYPES.forEach(type => {
                 listFilterState[type.value] = true;
             });
             updateInfoPanel(null, 'list');
-            renderRatedMarkers(); // 更新地图标记
+            renderRatedMarkers();
         };
         
-        window.clearAllFilters = function() {
-            // 更新保存的状态
+        window.clearAllRateFilters = function() {
             RATE_TYPES.forEach(type => {
                 listFilterState[type.value] = false;
             });
             updateInfoPanel(null, 'list');
-            renderRatedMarkers(); // 更新地图标记
+            renderRatedMarkers();
         };
         
-        window.toggleFilter = function(value) {
-            // 切换筛选器状态
+        window.toggleRateFilter = function(value) {
             listFilterState[value] = !listFilterState[value];
             updateInfoPanel(null, 'list');
-            renderRatedMarkers(); // 更新地图标记
+            renderRatedMarkers();
         };
+        
+        // 用户筛选相关函数
+        window.selectAllUserFilters = function() {
+            Object.keys(userFilterState).forEach(user => {
+                userFilterState[user] = userFilterMapping[user];
+            });
+            updateInfoPanel(null, 'list');
+            renderRatedMarkers();
+        };
+        
+        window.clearAllUserFilters = function() {
+            Object.keys(userFilterState).forEach(user => {
+                userFilterState[user] = null;
+            });
+            updateInfoPanel(null, 'list');
+            renderRatedMarkers();
+        };
+        
+        window.toggleUserFilter = function(value) {
+            // 如果用户未登录，显示登录提示
+            if (!isLoggedIn || !currentUser) {
+                showModal('login-modal');
+                return;
+            }
+            
+            // 确保映射存在
+            if (!userFilterMapping[value]) {
+                userFilterMapping[value] = currentUser.id;
+            }
+            
+            if (userFilterState[value] === userFilterMapping[value]) {
+                userFilterState[value] = null; // 取消选中
+            } else {
+                userFilterState[value] = userFilterMapping[value]; // 选中
+            }
+            
+            updateInfoPanel(null, 'list');
+            renderRatedMarkers();
+        };
+        
+        // 兼容旧函数名
+        window.selectAllFilters = window.selectAllRateFilters;
+        window.clearAllFilters = window.clearAllRateFilters;
+        window.toggleFilter = window.toggleRateFilter;
         
         window.showRestaurantDetail = function(uid) {
             const poi = window.ratedPois.find(p => p.uid === uid);
@@ -2207,10 +2444,14 @@
         
         // 在控制台查看筛选器状态
         window.showFilterState = function() {
-            console.log('筛选器状态:', listFilterState);
+            console.log('评分筛选器状态:', listFilterState);
+            console.log('用户筛选器状态:', userFilterState);
+            console.log('用户筛选器映射:', userFilterMapping);
+            console.log('当前用户:', currentUser);
             console.log('当前视图:', currentView);
             console.log('筛选后的餐厅数量:', getFilteredRatedPois().length);
             console.log('总餐厅数量:', window.ratedPois.length);
+            console.log('评分数据:', window.ratedPois);
         };
         
 
@@ -2227,6 +2468,12 @@
         window.onload = async function() {
             // 加载用户会话
             loadUserSession();
+            
+            // 初始化用户筛选状态
+            if (isLoggedIn && currentUser) {
+                userFilterState['自己'] = currentUser.id;
+                userFilterMapping['自己'] = currentUser.id;
+            }
             
             // 初始化地图
             initMap();

@@ -29,11 +29,49 @@ CREATE TABLE restaurant_reviews (
     UNIQUE(user_id, restaurant_uid)
 );
 
+-- 好友关系表
+CREATE TABLE friendships (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    friend_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    -- 确保好友关系是双向的，且不会重复
+    UNIQUE(user_id, friend_id),
+    -- 确保不能和自己成为好友
+    CHECK (user_id != friend_id)
+);
+
+-- 好友请求表
+CREATE TABLE friend_requests (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    sender_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    receiver_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'accepted', 'rejected')),
+    message TEXT, -- 好友请求的附加消息
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    -- 确保不能向自己发送好友请求
+    CHECK (sender_id != receiver_id),
+    -- 同一用户对同一用户只能有一个待处理的请求
+    UNIQUE(sender_id, receiver_id, status)
+);
+
 -- 创建索引
 CREATE INDEX idx_users_unique_id ON users(unique_id);
 CREATE INDEX idx_reviews_user_id ON restaurant_reviews(user_id);
 CREATE INDEX idx_reviews_restaurant_uid ON restaurant_reviews(restaurant_uid);
 CREATE INDEX idx_reviews_created_at ON restaurant_reviews(created_at);
+
+-- 好友关系索引
+CREATE INDEX idx_friendships_user_id ON friendships(user_id);
+CREATE INDEX idx_friendships_friend_id ON friendships(friend_id);
+CREATE INDEX idx_friendships_both_users ON friendships(user_id, friend_id);
+
+-- 好友请求索引
+CREATE INDEX idx_friend_requests_sender_id ON friend_requests(sender_id);
+CREATE INDEX idx_friend_requests_receiver_id ON friend_requests(receiver_id);
+CREATE INDEX idx_friend_requests_status ON friend_requests(status);
+CREATE INDEX idx_friend_requests_created_at ON friend_requests(created_at);
 
 -- 更新时间的触发器
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -46,4 +84,8 @@ $$ language 'plpgsql';
 
 CREATE TRIGGER update_restaurant_reviews_updated_at 
     BEFORE UPDATE ON restaurant_reviews 
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_friend_requests_updated_at 
+    BEFORE UPDATE ON friend_requests 
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column(); 
