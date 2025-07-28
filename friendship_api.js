@@ -43,8 +43,7 @@ class FriendshipAPI {
             const { data, error } = await this.supabase
                 .from('friendships')
                 .select('id')
-                .or(`user_id.eq.${userId1},friend_id.eq.${userId1}`)
-                .or(`user_id.eq.${userId2},friend_id.eq.${userId2}`)
+                .or(`and(user_id.eq.${userId1},friend_id.eq.${userId2}),and(user_id.eq.${userId2},friend_id.eq.${userId1})`)
                 .limit(1);
 
             if (error) {
@@ -70,8 +69,7 @@ class FriendshipAPI {
             const { error } = await this.supabase
                 .from('friendships')
                 .delete()
-                .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
-                .or(`user_id.eq.${friendId},friend_id.eq.${friendId}`);
+                .or(`and(user_id.eq.${userId},friend_id.eq.${friendId}),and(user_id.eq.${friendId},friend_id.eq.${userId})`);
 
             if (error) {
                 console.error('删除好友失败:', error);
@@ -375,10 +373,17 @@ class FriendshipAPI {
         try {
             // 获取好友列表
             const friends = await this.getFriendsList(userId);
-            const friendIds = friends.map(friend => friend.friend_id);
             
-            // 添加当前用户ID
-            const allUserIds = [userId, ...friendIds];
+            // 获取所有好友的ID（双向关系）
+            const friendIds = friends.map(friend => {
+                // 根据好友关系确定正确的ID
+                return friend.friend_id === userId ? friend.user_id : friend.friend_id;
+            });
+            
+            // 只查询好友的评分，不包括当前用户
+            if (friendIds.length === 0) {
+                return [];
+            }
 
             const { data, error } = await this.supabase
                 .from('restaurant_reviews')
@@ -391,7 +396,7 @@ class FriendshipAPI {
                         avatar_url
                     )
                 `)
-                .in('user_id', allUserIds)
+                .in('user_id', friendIds)
                 .eq('is_public', true)
                 .order('created_at', { ascending: false });
 
@@ -437,19 +442,25 @@ class FriendshipAPI {
     }
 
     /**
-     * 根据unique_id获取用户信息
+     * 根据unique_id获取用户信息（用于添加好友）
      * @param {string} uniqueId - 用户唯一标识
+     * @param {string} currentUserId - 当前用户ID（排除自己）
      * @returns {Promise<Object|null>} 用户信息
      */
-    async getUserByUniqueId(uniqueId) {
+    async getUserByUniqueId(uniqueId, currentUserId) {
         try {
             const { data, error } = await this.supabase
                 .from('users')
                 .select('id, nickname, unique_id, avatar_url, created_at')
                 .eq('unique_id', uniqueId)
+                .neq('id', currentUserId) // 排除当前用户自己
                 .single();
 
-            if (error && error.code !== 'PGRST116') {
+            if (error) {
+                if (error.code === 'PGRST116') {
+                    // 没有找到用户
+                    return null;
+                }
                 console.error('获取用户信息失败:', error);
                 throw error;
             }

@@ -474,6 +474,27 @@
             font-weight: bold;
         }
         
+        .restaurant-rate-container {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .friend-badge {
+            font-size: 10px;
+            color: #666;
+            background: #e6f7ff;
+            padding: 1px 4px;
+            border-radius: 3px;
+            border: 1px solid #91d5ff;
+        }
+        
+        .info-panel-value-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
         .restaurant-location {
             font-size: 11px;
             color: #666;
@@ -647,6 +668,42 @@
             background: #c82333;
         }
         
+        .friends-btn {
+            font-size: 12px;
+            padding: 4px 8px;
+            background: #1b8eec;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-left: 8px;
+        }
+        
+        .friends-btn:hover {
+            background: #40a9ff;
+        }
+        
+        .profile-btn {
+            font-size: 12px;
+            padding: 4px 8px;
+            background: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            margin-left: 8px;
+        }
+        
+        .profile-btn:hover {
+            background: #34ce57;
+        }
+        
         /* 认证模态框样式 */
         .auth-modal {
             display: none;
@@ -780,6 +837,249 @@
             background: #156bbd;
         }
         
+        /* 好友管理样式 */
+        .friends-tabs {
+            display: flex;
+            border-bottom: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+        
+        .friends-tab {
+            background: none;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+        
+        .friends-tab.active {
+            color: #1b8eec;
+            border-bottom-color: #1b8eec;
+        }
+        
+        .friends-tab:hover {
+            color: #1b8eec;
+        }
+        
+        .friends-tab-content {
+            display: none;
+        }
+        
+        .friends-tab-content.active {
+            display: block;
+        }
+        
+        .friends-list, .friend-requests-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .friend-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+        }
+        
+        .friend-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #1b8eec;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        .friend-info {
+            flex: 1;
+        }
+        
+        .friend-name {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .friend-id {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .friend-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .friend-action-btn {
+            padding: 4px 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .friend-action-btn.remove {
+            background: #ff4d4f;
+            color: white;
+        }
+        
+        .friend-action-btn.remove:hover {
+            background: #ff7875;
+        }
+        
+        .friend-action-btn.accept {
+            background: #52c41a;
+            color: white;
+        }
+        
+        .friend-action-btn.accept:hover {
+            background: #73d13d;
+        }
+        
+        .friend-action-btn.reject {
+            background: #ff4d4f;
+            color: white;
+        }
+        
+        .friend-action-btn.reject:hover {
+            background: #ff7875;
+        }
+        
+        .friend-action-btn.send {
+            background: #1b8eec;
+            color: white;
+        }
+        
+        .friend-action-btn.send:hover {
+            background: #40a9ff;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+        
+        .friends-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+        
+        .refresh-btn {
+            background: #1b8eec;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .refresh-btn:hover {
+            background: #40a9ff;
+        }
+        
+        .friend-message {
+            font-size: 12px;
+            color: #999;
+            margin-top: 4px;
+        }
+        
+        /* 个人信息样式 */
+        .profile-info {
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            margin-bottom: 24px;
+        }
+        
+        .profile-avatar-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #1b8eec;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+        
+        .profile-details {
+            text-align: left;
+        }
+        
+        .profile-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .profile-item:last-child {
+            border-bottom: none;
+        }
+        
+        .profile-item label {
+            font-weight: 500;
+            color: #333;
+            min-width: 80px;
+        }
+        
+        .profile-item span {
+            color: #666;
+            flex: 1;
+            text-align: right;
+            margin-right: 8px;
+        }
+        
+        .profile-id-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: flex-end;
+        }
+        
+        .copy-btn {
+            background: #1b8eec;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .copy-btn:hover {
+            background: #40a9ff;
+        }
+        
+        .copy-btn.copied {
+            background: #52c41a;
+        }
+        
         .auth-submit-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
@@ -840,6 +1140,8 @@
         <div class="user-status-logged-in" id="user-status-logged-in" style="display: none;">
             <div class="user-info">
                 <span class="user-nickname" id="user-nickname">👤 用户昵称</span>
+                <button class="profile-btn" id="profile-btn" onclick="showProfileModal()">👤 个人信息</button>
+                <button class="friends-btn" id="friends-btn" onclick="showFriendsModal()">👥 好友</button>
                 <button class="logout-btn" id="logout-btn">🚪 退出</button>
             </div>
         </div>
@@ -906,6 +1208,96 @@
         </div>
     </div>
     
+    <!-- 好友管理模态框 -->
+    <div class="auth-modal" id="friends-modal">
+        <div class="auth-modal-content" style="max-width: 600px;">
+            <div class="auth-modal-header">
+                <h2>好友管理</h2>
+                <button class="auth-modal-close" id="friends-modal-close">&times;</button>
+            </div>
+            <div class="auth-modal-body">
+                <!-- 标签页导航 -->
+                <div class="friends-tabs">
+                    <button class="friends-tab active" data-tab="friends-list">好友列表</button>
+                    <button class="friends-tab" data-tab="add-friend">添加好友</button>
+                    <button class="friends-tab" data-tab="friend-requests">好友请求</button>
+                </div>
+                
+                <!-- 好友列表标签页 -->
+                <div class="friends-tab-content active" id="friends-list-tab">
+                    <div class="friends-header">
+                        <button class="refresh-btn" onclick="refreshFriendsList()">🔄 刷新</button>
+                    </div>
+                    <div class="friends-list" id="friends-list">
+                        <div class="loading">加载中...</div>
+                    </div>
+                </div>
+                
+                <!-- 添加好友标签页 -->
+                <div class="friends-tab-content" id="add-friend-tab">
+                    <div class="add-friend-form">
+                        <div class="form-group">
+                            <label for="search-user-id">搜索用户</label>
+                            <input type="text" id="search-user-id" placeholder="请输入用户唯一ID" required>
+                        </div>
+                        <button type="button" id="search-user-btn" class="auth-submit-btn">搜索用户</button>
+                        <div id="search-result" style="margin-top: 16px;"></div>
+                    </div>
+                </div>
+                
+                <!-- 好友请求标签页 -->
+                <div class="friends-tab-content" id="friend-requests-tab">
+                    <div class="friends-header">
+                        <button class="refresh-btn" onclick="refreshFriendRequests()">🔄 刷新</button>
+                    </div>
+                    <div class="friend-requests-list" id="friend-requests-list">
+                        <div class="loading">加载中...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 个人信息模态框 -->
+    <div class="auth-modal" id="profile-modal">
+        <div class="auth-modal-content" style="max-width: 500px;">
+            <div class="auth-modal-header">
+                <h2>个人信息</h2>
+                <button class="auth-modal-close" id="profile-modal-close">&times;</button>
+            </div>
+            <div class="auth-modal-body">
+                <div class="profile-info" id="profile-info">
+                    <div class="profile-avatar">
+                        <div class="profile-avatar-circle" id="profile-avatar-circle">
+                            <!-- 头像将在这里显示 -->
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <div class="profile-item">
+                            <label>昵称</label>
+                            <span id="profile-nickname">加载中...</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>唯一ID</label>
+                            <div class="profile-id-container">
+                                <span id="profile-unique-id">加载中...</span>
+                                <button class="copy-btn" onclick="copyUniqueId()">复制</button>
+                            </div>
+                        </div>
+                        <div class="profile-item">
+                            <label>注册时间</label>
+                            <span id="profile-created-at">加载中...</span>
+                        </div>
+                        <div class="profile-item">
+                            <label>评分统计</label>
+                            <span id="profile-rating-count">加载中...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div id="map"></div>
     
     <!-- 信息面板 -->
@@ -925,6 +1317,8 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Supabase 配置 -->
     <script src="supabase_config.js"></script>
+    <!-- 好友API -->
+    <script src="friendship_api.js"></script>
     <!-- 百度地图API -->
     <script src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=37RkgO1xJD842QrZ0AnUGHpCOYSGg3kh"></script>
     <script>
@@ -1178,6 +1572,7 @@
             }
             
             try {
+                // 加载自己的评分
                 const { data: reviews, error } = await supabase
                     .from('restaurant_reviews')
                     .select('*')
@@ -1190,7 +1585,7 @@
                 }
                 
                 // 将数据库格式转换为应用格式
-                window.ratedPois = reviews.map(review => ({
+                let myReviews = reviews.map(review => ({
                     uid: review.restaurant_uid,
                     title: review.restaurant_name,
                     shortTitle: getShortTitle(review.restaurant_name),
@@ -1212,11 +1607,120 @@
                     created_at: review.created_at,
                     updated_at: review.updated_at
                 }));
+                
+                // 加载好友的评分
+                const friendsReviews = await loadFriendsReviews();
+                
+                // 合并所有评分
+                window.ratedPois = [...myReviews, ...friendsReviews];
+                
+                // 更新用户筛选器
+                await updateUserFilters();
+                
             } catch (error) {
                 console.error('加载评分数据错误:', error);
                 window.ratedPois = [];
             }
         }
+        
+        // 加载好友的评分数据
+        async function loadFriendsReviews() {
+            if (!friendshipAPI) {
+                initFriendshipAPI();
+            }
+            
+            try {
+                const friendsReviews = await friendshipAPI.getAllFriendsReviews(currentUser.id);
+                
+                // 获取好友列表以获取昵称
+                const friends = await friendshipAPI.getFriendsList(currentUser.id);
+                
+                // 转换为应用格式
+                return friendsReviews.map(review => {
+                    // 从好友列表中查找对应的昵称
+                    const friend = friends.find(f => {
+                        const friendId = f.friend_id === currentUser.id ? f.user_id : f.friend_id;
+                        return friendId === review.user_id;
+                    });
+                    
+                    const friendNickname = friend ? 
+                        (friend.friend_id === currentUser.id ? friend.user_nickname : friend.friend_nickname) : 
+                        `用户${review.user_id.slice(0, 8)}`;
+                    
+                    return {
+                        uid: review.restaurant_uid,
+                        title: review.restaurant_name,
+                        shortTitle: getShortTitle(review.restaurant_name),
+                        address: review.restaurant_address,
+                        point: review.longitude && review.latitude ? {
+                            lng: review.longitude,
+                            lat: review.latitude
+                        } : undefined,
+                        city: review.restaurant_city,
+                        area: review.restaurant_area,
+                        tags: review.tags || [],
+                        phoneNumber: null,
+                        rate: review.rating,
+                        // 添加数据库字段
+                        review_id: review.id,
+                        user_id: review.user_id,
+                        review_text: review.review_text,
+                        is_public: review.is_public,
+                        created_at: review.created_at,
+                        updated_at: review.updated_at,
+                        // 添加好友信息
+                        friend_nickname: friendNickname,
+                        is_friend_review: true
+                    };
+                });
+            } catch (error) {
+                console.error('加载好友评分失败:', error);
+                return [];
+            }
+        }
+        
+        // 更新用户筛选器
+        async function updateUserFilters() {
+            if (!friendshipAPI) {
+                initFriendshipAPI();
+            }
+            
+            try {
+                // 重置用户筛选状态 - 默认只显示自己的
+                userFilterState = { self: true };
+                userFilterMapping = { self: currentUser.id };
+                
+                // 获取好友列表
+                const friends = await friendshipAPI.getFriendsList(currentUser.id);
+                
+                // 保存好友列表到全局变量，供筛选器显示使用
+                window.friendsList = friends;
+                
+                // 为每个好友添加到筛选器
+                friends.forEach(friend => {
+                    const friendId = friend.friend_id === currentUser.id ? friend.user_id : friend.friend_id;
+                    const friendNickname = friend.friend_id === currentUser.id ? friend.user_nickname : friend.friend_nickname;
+                    
+                    userFilterState[`friend_${friendId}`] = false; // 默认不选中好友
+                    userFilterMapping[`friend_${friendId}`] = friendId;
+                });
+                
+                console.log('用户筛选器已更新:', userFilterState);
+                console.log('用户筛选器映射已更新:', userFilterMapping);
+                console.log('好友列表已保存:', window.friendsList);
+                
+            } catch (error) {
+                console.error('更新用户筛选器失败:', error);
+            }
+        }
+        
+        // 刷新用户筛选器
+        window.refreshUserFilters = async function() {
+            console.log('刷新用户筛选器');
+            await updateUserFilters();
+            clearFilterCache();
+            updateInfoPanel(null, 'list'); // 刷新列表视图
+        };
         
         async function saveRatedPoi(poi, rate) {
             if (!isLoggedIn || !currentUser) {
@@ -1267,58 +1771,95 @@
                 return;
             }
             
-            try {
-                // 保存到Supabase
-                const savedReview = await saveRatedPoi(poi, rate);
+            // 立即更新本地数据和UI，提供即时反馈
+            const idx = window.ratedPois.findIndex(f => f.uid === poi.uid);
+            const title = getPoiField(poi, ['title', 'name']);
+            const shortTitle = getShortTitle(title);
+            const address = getPoiField(poi, ['address', 'addr']);
+            const city = getPoiField(poi, ['city', 'cityname']);
+            const area = getPoiField(poi, ['area', 'areaname', 'district']);
+            const tags = getPoiField(poi, ['tags', 'std_tag', 'tag']) || [];
+            
+            if (idx === -1) {
+                // 新增评分 - 先添加到本地数据
+                const newPoi = {
+                    uid: poi.uid,
+                    title: title,
+                    shortTitle: shortTitle,
+                    address: address,
+                    point: poi.point ? {lng: poi.point.lng, lat: poi.point.lat} : undefined,
+                    city: city,
+                    area: area,
+                    tags: tags,
+                    rate: rate,
+                    user_id: currentUser.id,
+                    review_id: null, // 临时设为null，保存后更新
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                };
+                window.ratedPois.push(newPoi);
                 
-                // 更新本地数据
-                const idx = window.ratedPois.findIndex(f => f.uid === poi.uid);
-                const title = getPoiField(poi, ['title', 'name']);
-                const shortTitle = getShortTitle(title);
-                const address = getPoiField(poi, ['address', 'addr']);
-                const city = getPoiField(poi, ['city', 'cityname']);
-                const area = getPoiField(poi, ['area', 'areaname', 'district']);
-                const tags = getPoiField(poi, ['tags', 'std_tag', 'tag']) || [];
+                // 清除筛选缓存
+                clearFilterCache();
                 
-                if (idx === -1) {
-                    // 新增评分
-                    window.ratedPois.push({
-                        uid: poi.uid,
-                        title: title,
-                        shortTitle: shortTitle,
-                        address: address,
-                        point: poi.point ? {lng: poi.point.lng, lat: poi.point.lat} : undefined,
-                        city: city,
-                        area: area,
-                        tags: tags,
-                        rate: rate,
-                        review_id: savedReview.id,
-                        created_at: savedReview.created_at,
-                        updated_at: savedReview.updated_at
-                    });
-                } else {
-                    // 更新评分
-                    window.ratedPois[idx].rate = rate;
-                    window.ratedPois[idx].shortTitle = shortTitle;
-                    window.ratedPois[idx].title = title;
-                    window.ratedPois[idx].address = address;
-                    window.ratedPois[idx].city = city;
-                    window.ratedPois[idx].area = area;
-                    window.ratedPois[idx].tags = tags;
-                    window.ratedPois[idx].updated_at = savedReview.updated_at;
-                }
-                
-                renderRatedMarkers();
-                // 如果当前在列表视图，更新面板
+                // 立即更新UI
+                updateSingleMarker(newPoi);
                 if (currentView === 'list') {
                     updateInfoPanel(null, 'list');
                 }
-                // 如果当前在详情视图且是同一个餐厅，更新详情面板
                 if (currentView === 'detail' && currentPoi && currentPoi.uid === poi.uid) {
                     updateInfoPanel(poi, 'detail');
                 }
+            } else {
+                // 更新评分 - 立即更新本地数据
+                const oldRate = window.ratedPois[idx].rate;
+                window.ratedPois[idx].rate = rate;
+                window.ratedPois[idx].shortTitle = shortTitle;
+                window.ratedPois[idx].title = title;
+                window.ratedPois[idx].address = address;
+                window.ratedPois[idx].city = city;
+                window.ratedPois[idx].area = area;
+                window.ratedPois[idx].tags = tags;
+                window.ratedPois[idx].updated_at = new Date().toISOString();
+                
+                // 清除筛选缓存
+                clearFilterCache();
+                
+                // 立即更新UI
+                updateSingleMarker(window.ratedPois[idx]);
+                if (currentView === 'list') {
+                    updateInfoPanel(null, 'list');
+                }
+                if (currentView === 'detail' && currentPoi && currentPoi.uid === poi.uid) {
+                    updateInfoPanel(poi, 'detail');
+                }
+            }
+            
+            // 异步保存到数据库
+            try {
+                const savedReview = await saveRatedPoi(poi, rate);
+                
+                // 更新数据库返回的字段
+                if (idx === -1) {
+                    // 找到刚添加的评分
+                    const newIdx = window.ratedPois.findIndex(f => f.uid === poi.uid && f.review_id === null);
+                    if (newIdx !== -1) {
+                        window.ratedPois[newIdx].review_id = savedReview.id;
+                        window.ratedPois[newIdx].created_at = savedReview.created_at;
+                        window.ratedPois[newIdx].updated_at = savedReview.updated_at;
+                    }
+                } else {
+                    window.ratedPois[idx].updated_at = savedReview.updated_at;
+                }
             } catch (error) {
                 console.error('保存评分失败:', error);
+                // 如果保存失败，回滚本地数据
+                if (idx === -1) {
+                    window.ratedPois = window.ratedPois.filter(f => f.uid !== poi.uid);
+                } else {
+                    window.ratedPois[idx].rate = oldRate;
+                }
+                renderRatedMarkers(); // 重新渲染以回滚UI
                 alert('保存评分失败，请重试');
             }
         }
@@ -1330,8 +1871,29 @@
                 return;
             }
             
+            // 立即从本地数据移除并更新UI
+            const removedPoi = window.ratedPois.find(f => f.uid === uid);
+            window.ratedPois = window.ratedPois.filter(f => f.uid !== uid);
+            
+            // 清除筛选缓存
+            clearFilterCache();
+            
+            // 立即移除地图标记
+            if (window.ratedMarkers[uid]) {
+                map.removeOverlay(window.ratedMarkers[uid]);
+                delete window.ratedMarkers[uid];
+            }
+            
+            // 立即更新UI
+            if (currentView === 'list') {
+                updateInfoPanel(null, 'list');
+            }
+            if (currentView === 'detail' && currentPoi && currentPoi.uid === uid) {
+                updateInfoPanel(currentPoi, 'detail');
+            }
+            
+            // 异步从数据库删除
             try {
-                // 从Supabase删除
                 const { error } = await supabase
                     .from('restaurant_reviews')
                     .delete()
@@ -1342,20 +1904,19 @@
                     console.error('删除评分错误:', error);
                     throw new Error('删除评分失败');
                 }
-                
-                // 更新本地数据
-                window.ratedPois = window.ratedPois.filter(f => f.uid !== uid);
-                renderRatedMarkers();
-                // 如果当前在列表视图，更新面板
+            } catch (error) {
+                console.error('删除评分失败:', error);
+                // 如果删除失败，恢复本地数据
+                if (removedPoi) {
+                    window.ratedPois.push(removedPoi);
+                    updateSingleMarker(removedPoi);
+                }
                 if (currentView === 'list') {
                     updateInfoPanel(null, 'list');
                 }
-                // 如果当前在详情视图且是同一个餐厅，更新详情面板
                 if (currentView === 'detail' && currentPoi && currentPoi.uid === uid) {
                     updateInfoPanel(currentPoi, 'detail');
                 }
-            } catch (error) {
-                console.error('删除评分失败:', error);
                 alert('删除评分失败，请重试');
             }
         }
@@ -1371,6 +1932,12 @@
         function renderRatedMarkers() {
             if(window.ratedMarkers) Object.values(window.ratedMarkers).forEach(marker => map.removeOverlay(marker));
             window.ratedMarkers = {};
+            
+            // 清除之前的昵称标签
+            if(window.nicknameLabels) {
+                Object.values(window.nicknameLabels).forEach(label => map.removeOverlay(label));
+                window.nicknameLabels = {};
+            }
             
             // 使用筛选后的数据来渲染标记
             const filteredPois = getFilteredRatedPois();
@@ -1388,12 +1955,85 @@
                     border: 'none', padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold', zIndex: 999
                 });
                 marker.setLabel(label);
+                
+                // 为好友评分添加昵称标签（作为独立的overlay）
+                if (poi.is_friend_review && poi.friend_nickname) {
+                    const nicknameLabel = new BMapGL.Label(poi.friend_nickname, { offset: new BMapGL.Size(-30, -50) });
+                    nicknameLabel.setStyle({
+                        color: '#666', fontSize: '10px', background: 'rgba(230,247,255,0.9)',
+                        border: '1px solid #91d5ff', padding: '1px 4px', borderRadius: '3px', 
+                        fontWeight: 'normal', zIndex: 1000, whiteSpace: 'nowrap'
+                    });
+                    // 将昵称标签作为独立的overlay添加到地图
+                    map.addOverlay(nicknameLabel);
+                    // 保存昵称标签引用，以便后续移除
+                    if (!window.nicknameLabels) window.nicknameLabels = {};
+                    window.nicknameLabels[poi.uid] = nicknameLabel;
+                }
+                
                 map.addOverlay(marker);
                 window.ratedMarkers[poi.uid] = marker;
                 marker.addEventListener('click', function() {
                     showPoiInfoWindow(poi, marker);
                 });
             });
+        }
+        
+        // 优化：只更新单个标记，而不是重新渲染所有标记
+        function updateSingleMarker(poi) {
+            if (!poi.point || typeof poi.point.lng !== 'number' || typeof poi.point.lat !== 'number') return;
+            
+            // 检查是否应该显示这个标记（基于筛选条件）
+            const filteredPois = getFilteredRatedPois();
+            const shouldShow = filteredPois.some(fp => fp.uid === poi.uid);
+            
+            // 如果标记已存在，先移除
+            if (window.ratedMarkers[poi.uid]) {
+                map.removeOverlay(window.ratedMarkers[poi.uid]);
+                delete window.ratedMarkers[poi.uid];
+            }
+            
+            // 如果昵称标签已存在，也移除
+            if (window.nicknameLabels && window.nicknameLabels[poi.uid]) {
+                map.removeOverlay(window.nicknameLabels[poi.uid]);
+                delete window.nicknameLabels[poi.uid];
+            }
+            
+            // 如果应该显示，则添加新标记
+            if (shouldShow) {
+                const pt = new BMapGL.Point(poi.point.lng, poi.point.lat);
+                const svg = getRatedSvg(poi.rate);
+                const svgUrl = 'data:image/svg+xml;base64,' + btoa(svg);
+                const icon = new BMapGL.Icon(svgUrl, new BMapGL.Size(32, 40), { anchor: new BMapGL.Size(16, 40) });
+                const marker = new BMapGL.Marker(pt, {icon: icon});
+                const label = new BMapGL.Label(poi.shortTitle || poi.title, { offset: new BMapGL.Size(20, -10) });
+                label.setStyle({
+                    color: '#333', fontSize: '14px', background: 'rgba(255,255,255,0.85)',
+                    border: 'none', padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold', zIndex: 999
+                });
+                marker.setLabel(label);
+                
+                // 为好友评分添加昵称标签（作为独立的overlay）
+                if (poi.is_friend_review && poi.friend_nickname) {
+                    const nicknameLabel = new BMapGL.Label(poi.friend_nickname, { offset: new BMapGL.Size(-8, -35) });
+                    nicknameLabel.setStyle({
+                        color: '#666', fontSize: '10px', background: 'rgba(230,247,255,0.9)',
+                        border: '1px solid #91d5ff', padding: '1px 4px', borderRadius: '3px', 
+                        fontWeight: 'normal', zIndex: 1000, whiteSpace: 'nowrap'
+                    });
+                    // 将昵称标签作为独立的overlay添加到地图
+                    map.addOverlay(nicknameLabel);
+                    // 保存昵称标签引用，以便后续移除
+                    if (!window.nicknameLabels) window.nicknameLabels = {};
+                    window.nicknameLabels[poi.uid] = nicknameLabel;
+                }
+                
+                map.addOverlay(marker);
+                window.ratedMarkers[poi.uid] = marker;
+                marker.addEventListener('click', function() {
+                    showPoiInfoWindow(poi, marker);
+                });
+            }
         }
         function clearPoiMarkers() {
             if (window._poiMarkers) {
@@ -1618,11 +2258,15 @@
                             e.target.reset();
                             
                             // 更新用户筛选状态
-                            userFilterState['自己'] = currentUser.id;
-                            userFilterMapping['自己'] = currentUser.id;
+                            userFilterState = { self: true };
+                            userFilterMapping = { self: currentUser.id };
+                            
+                            // 初始化好友API
+                            initFriendshipAPI();
                             
                             // 加载用户评分数据
                             await loadRatedPois();
+                            await updateUserFilters(); // 更新用户筛选器
                             renderRatedMarkers();
                             updateMapViewportForRatedPois();
                             updateInfoPanel(null, 'list'); // 新增：登录后立即刷新评分列表
@@ -1700,11 +2344,15 @@
                             e.target.reset();
                             
                             // 更新用户筛选状态
-                            userFilterState['自己'] = currentUser.id;
-                            userFilterMapping['自己'] = currentUser.id;
+                            userFilterState = { self: true };
+                            userFilterMapping = { self: currentUser.id };
+                            
+                            // 初始化好友API
+                            initFriendshipAPI();
                             
                             // 加载用户评分数据
                             await loadRatedPois();
+                            await updateUserFilters(); // 更新用户筛选器
                             renderRatedMarkers();
                             updateMapViewportForRatedPois();
                             updateInfoPanel(null, 'list'); // 新增：注册后立即刷新评分列表
@@ -2022,17 +2670,33 @@
                                     <div class="filter-section-title">
                                         👤 用户筛选
                                     </div>
-                                    <div class="filter-section-content">
-                                        ${Object.keys(userFilterState).map(user => `
-                                            <div class="filter-checkbox-container" onclick="toggleUserFilter('${user}')">
-                                                <input type="checkbox" class="user-filter" value="${user}" ${userFilterState[user] !== null ? 'checked' : ''} onclick="event.stopPropagation(); toggleUserFilter('${user}');">
-                                                <span>${user}</span>
-                                            </div>
-                                        `).join('')}
+                                    <div class="filter-section-content" id="user-filter-content">
+                                        ${Object.keys(userFilterState).map(user => {
+                                            // 获取显示名称
+                                            let displayName = user;
+                                            if (user === 'self') {
+                                                displayName = '自己';
+                                            } else if (user.startsWith('friend_')) {
+                                                // 从好友列表中获取昵称
+                                                const friendId = userFilterMapping[user];
+                                                const friend = window.friendsList ? window.friendsList.find(f => 
+                                                    (f.friend_id === currentUser.id ? f.user_id : f.friend_id) === friendId
+                                                ) : null;
+                                                displayName = friend ? (friend.friend_id === currentUser.id ? friend.user_nickname : friend.friend_nickname) : `好友${friendId.slice(0, 8)}`;
+                                            }
+                                            
+                                            return `
+                                                <div class="filter-checkbox-container" onclick="toggleUserFilter('${user}')">
+                                                    <input type="checkbox" class="user-filter" value="${user}" ${userFilterState[user] ? 'checked' : ''} onclick="event.stopPropagation(); toggleUserFilter('${user}');">
+                                                    <span>${displayName}</span>
+                                                </div>
+                                            `;
+                                        }).join('')}
                                     </div>
                                     <div class="filter-actions">
                                         <button class="info-panel-btn" onclick="selectAllUserFilters()">全选</button>
                                         <button class="info-panel-btn" onclick="clearAllUserFilters()">全不选</button>
+                                        <button class="info-panel-btn" onclick="refreshUserFilters()">🔄 刷新好友</button>
                                     </div>
                                 </div>
                                 
@@ -2053,11 +2717,16 @@
                             <div class="restaurant-list">
                                 ${filteredPois.length > 0 ? filteredPois.map(poi => {
                                     const rateType = RATE_TYPES.find(t => t.value === poi.rate);
+                                    const isFriendReview = poi.is_friend_review;
+                                    const reviewerName = isFriendReview ? poi.friend_nickname : '我';
                                     return `
                                         <div class="restaurant-item" onclick="showRestaurantDetail('${poi.uid}')">
                                             <div class="restaurant-header">
                                                 <span class="restaurant-name">${poi.shortTitle || poi.title}</span>
-                                                <span class="restaurant-rate" style="color: ${rateType?.drop || '#666'}">${poi.rate}</span>
+                                                <div class="restaurant-rate-container">
+                                                    ${isFriendReview ? `<span class="friend-badge">👤 ${reviewerName}</span>` : ''}
+                                                    <span class="restaurant-rate" style="color: ${rateType?.drop || '#666'}">${poi.rate}</span>
+                                                </div>
                                             </div>
                                             <div class="restaurant-location">${poi.city || ''}${poi.area ? ' · ' + poi.area : ''}</div>
                                             <div class="restaurant-address">${poi.address || ''}</div>
@@ -2147,7 +2816,10 @@
                             ${ratedPoi ? `
                                 <div class="info-panel-item">
                                     <span class="info-panel-label">当前评分</span>
-                                    <span class="info-panel-value" style="color: ${RATE_TYPES.find(t => t.value === ratedPoi.rate)?.drop || '#666'}">${ratedPoi.rate}</span>
+                                    <div class="info-panel-value-container">
+                                        <span class="info-panel-value" style="color: ${RATE_TYPES.find(t => t.value === ratedPoi.rate)?.drop || '#666'}">${ratedPoi.rate}</span>
+                                        ${ratedPoi.is_friend_review ? `<span class="friend-badge">👤 ${ratedPoi.friend_nickname}</span>` : ''}
+                                    </div>
                                 </div>
                             ` : `
                                 <div class="info-panel-item">
@@ -2190,7 +2862,19 @@
                             return;
                         }
                         const rate = btn.getAttribute('data-rate');
-                        await addOrUpdateRatedPoi(poi, rate);
+                        
+                        // 添加加载状态
+                        const originalText = btn.textContent;
+                        btn.textContent = '保存中...';
+                        btn.disabled = true;
+                        
+                        try {
+                            await addOrUpdateRatedPoi(poi, rate);
+                        } finally {
+                            // 恢复按钮状态
+                            btn.textContent = originalText;
+                            btn.disabled = false;
+                        }
                     }
                 });
                 
@@ -2200,7 +2884,19 @@
                             showModal('login-modal');
                             return;
                         }
-                        await removeRatedPoi(poi.uid);
+                        
+                        // 添加加载状态
+                        const originalText = removeBtn.textContent;
+                        removeBtn.textContent = '删除中...';
+                        removeBtn.disabled = true;
+                        
+                        try {
+                            await removeRatedPoi(poi.uid);
+                        } finally {
+                            // 恢复按钮状态
+                            removeBtn.textContent = originalText;
+                            removeBtn.disabled = false;
+                        }
                     }
                 }
             }
@@ -2237,21 +2933,37 @@
         
         // 保存用户筛选器状态 - 映射显示名称到用户ID
         let userFilterState = {
-            '自己': currentUser ? currentUser.id : null
+            self: currentUser ? currentUser.id : null
         };
         
         // 用户筛选器显示名称到用户ID的映射
         let userFilterMapping = {
-            '自己': currentUser ? currentUser.id : null
+            self: currentUser ? currentUser.id : null
         };
         
         // 保存筛选条展开状态
         let filterBarExpanded = false;
         
+        // 缓存筛选结果以提高性能
+        let filteredPoisCache = null;
+        let lastFilterState = null;
+        
         function getFilteredRatedPois() {
+            // 检查筛选状态是否发生变化
+            const currentFilterState = JSON.stringify({
+                listFilterState,
+                userFilterState,
+                ratedPoisLength: window.ratedPois.length
+            });
+            
+            // 如果筛选状态没有变化且缓存存在，直接返回缓存
+            if (lastFilterState === currentFilterState && filteredPoisCache !== null) {
+                return filteredPoisCache;
+            }
+            
             // 使用保存的状态进行筛选，不再从DOM读取
             const checkedRates = Object.keys(listFilterState).filter(key => listFilterState[key]);
-            const checkedUserIds = Object.values(userFilterState).filter(userId => userId !== null);
+            const checkedUserIds = Object.keys(userFilterState).filter(key => userFilterState[key]).map(key => userFilterMapping[key]);
             
             // 先按评分筛选
             let filteredPois = window.ratedPois.filter(poi => checkedRates.includes(poi.rate));
@@ -2271,7 +2983,17 @@
                 return indexA - indexB;
             });
             
+            // 更新缓存
+            filteredPoisCache = sortedPois;
+            lastFilterState = currentFilterState;
+            
             return sortedPois;
+        }
+        
+        // 清除筛选缓存（当数据发生变化时调用）
+        function clearFilterCache() {
+            filteredPoisCache = null;
+            lastFilterState = null;
         }
         
         // 筛选条相关函数
@@ -2289,7 +3011,7 @@
         
         function getFilterSummary() {
             const checkedRates = Object.keys(listFilterState).filter(key => listFilterState[key]);
-            const checkedUsers = Object.keys(userFilterState).filter(key => userFilterState[key] !== null);
+            const checkedUsers = Object.keys(userFilterState).filter(key => userFilterState[key]);
             return `${checkedRates.length}个评分类型, ${checkedUsers.length}个用户`;
         }
         
@@ -2312,6 +3034,7 @@
         
         window.toggleRateFilter = function(value) {
             listFilterState[value] = !listFilterState[value];
+            clearFilterCache(); // 清除筛选缓存
             updateInfoPanel(null, 'list');
             renderRatedMarkers();
         };
@@ -2319,7 +3042,7 @@
         // 用户筛选相关函数
         window.selectAllUserFilters = function() {
             Object.keys(userFilterState).forEach(user => {
-                userFilterState[user] = userFilterMapping[user];
+                userFilterState[user] = true;
             });
             updateInfoPanel(null, 'list');
             renderRatedMarkers();
@@ -2327,7 +3050,7 @@
         
         window.clearAllUserFilters = function() {
             Object.keys(userFilterState).forEach(user => {
-                userFilterState[user] = null;
+                userFilterState[user] = false;
             });
             updateInfoPanel(null, 'list');
             renderRatedMarkers();
@@ -2345,12 +3068,9 @@
                 userFilterMapping[value] = currentUser.id;
             }
             
-            if (userFilterState[value] === userFilterMapping[value]) {
-                userFilterState[value] = null; // 取消选中
-            } else {
-                userFilterState[value] = userFilterMapping[value]; // 选中
-            }
+            userFilterState[value] = !userFilterState[value]; // 切换选中状态
             
+            clearFilterCache(); // 清除筛选缓存
             updateInfoPanel(null, 'list');
             renderRatedMarkers();
         };
@@ -2471,14 +3191,17 @@
             
             // 初始化用户筛选状态
             if (isLoggedIn && currentUser) {
-                userFilterState['自己'] = currentUser.id;
-                userFilterMapping['自己'] = currentUser.id;
+                userFilterState = { self: currentUser.id };
+                userFilterMapping = { self: currentUser.id };
+                // 初始化好友API
+                initFriendshipAPI();
             }
             
             // 初始化地图
             initMap();
             bindUIEvents();
             bindAuthEvents(); // 绑定认证相关事件
+            bindFriendsEvents(); // 绑定好友管理事件
             
             // 如果用户已登录，加载评分数据
             if (isLoggedIn) {
@@ -2511,6 +3234,388 @@
             console.log('- showFilterState(): 查看筛选器状态');
             console.log('- clearLocalStorage(): 清理localStorage');
             console.log('- 按 I 键或点击标题栏可切换信息面板显示状态');
+        }
+        
+        // ===================== 个人信息管理功能 =====================
+        
+        // 显示个人信息模态框
+        window.showProfileModal = function() {
+            if (!isLoggedIn || !currentUser) {
+                showModal('login-modal');
+                return;
+            }
+            
+            showModal('profile-modal');
+            loadProfileInfo();
+        };
+        
+        // 加载个人信息
+        async function loadProfileInfo() {
+            try {
+                // 显示头像（昵称首字母）
+                const avatarCircle = document.getElementById('profile-avatar-circle');
+                const nickname = currentUser.nickname || '用户';
+                avatarCircle.textContent = nickname.charAt(0).toUpperCase();
+                
+                // 显示基本信息
+                document.getElementById('profile-nickname').textContent = currentUser.nickname || '未设置';
+                document.getElementById('profile-unique-id').textContent = currentUser.unique_id || '未设置';
+                
+                // 格式化注册时间
+                const createdAt = currentUser.created_at ? new Date(currentUser.created_at) : new Date();
+                document.getElementById('profile-created-at').textContent = createdAt.toLocaleDateString('zh-CN');
+                
+                // 获取评分统计
+                const ratingCount = window.ratedPois.length;
+                document.getElementById('profile-rating-count').textContent = `${ratingCount} 个餐厅评分`;
+                
+            } catch (error) {
+                console.error('加载个人信息失败:', error);
+                alert('加载个人信息失败，请重试');
+            }
+        }
+        
+        // 复制唯一ID
+        window.copyUniqueId = function() {
+            const uniqueId = currentUser.unique_id;
+            if (!uniqueId) {
+                alert('唯一ID未设置');
+                return;
+            }
+            
+            // 复制到剪贴板
+            navigator.clipboard.writeText(uniqueId).then(() => {
+                const copyBtn = document.querySelector('.copy-btn');
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '已复制';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(() => {
+                // 如果剪贴板API不可用，使用传统方法
+                const textArea = document.createElement('textarea');
+                textArea.value = uniqueId;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                const copyBtn = document.querySelector('.copy-btn');
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = '已复制';
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            });
+        };
+        
+        // 手动刷新好友列表
+        window.refreshFriendsList = function() {
+            console.log('手动刷新好友列表');
+            loadFriendsList();
+        };
+        
+        // 手动刷新好友请求
+        window.refreshFriendRequests = function() {
+            console.log('手动刷新好友请求');
+            loadFriendRequests();
+        };
+        
+        // ===================== 好友管理功能 =====================
+        let friendshipAPI = null;
+        
+        // 初始化好友API
+        function initFriendshipAPI() {
+            if (isLoggedIn && currentUser) {
+                friendshipAPI = new FriendshipAPI(supabase);
+            }
+        }
+        
+        // 显示好友管理模态框
+        window.showFriendsModal = function() {
+            if (!isLoggedIn || !currentUser) {
+                showModal('login-modal');
+                return;
+            }
+            
+            if (!friendshipAPI) {
+                initFriendshipAPI();
+            }
+            
+            showModal('friends-modal');
+            loadFriendsList();
+            loadFriendRequests();
+            
+            // 启动自动刷新
+            startAutoRefresh();
+        };
+        
+        // 自动刷新相关变量
+        let autoRefreshInterval = null;
+        let lastFriendsCount = 0;
+        let lastRequestsCount = 0;
+        
+        // 启动自动刷新
+        function startAutoRefresh() {
+            // 清除之前的定时器
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+            }
+            
+            // 每5秒检查一次更新
+            autoRefreshInterval = setInterval(async () => {
+                try {
+                    // 检查好友列表是否有更新
+                    const friends = await friendshipAPI.getFriendsList(currentUser.id);
+                    const requests = await friendshipAPI.getReceivedRequests(currentUser.id);
+                    
+                    // 如果数量发生变化，自动刷新
+                    if (friends.length !== lastFriendsCount) {
+                        console.log('检测到好友列表更新，自动刷新');
+                        loadFriendsList();
+                        lastFriendsCount = friends.length;
+                    }
+                    
+                    if (requests.length !== lastRequestsCount) {
+                        console.log('检测到好友请求更新，自动刷新');
+                        loadFriendRequests();
+                        lastRequestsCount = requests.length;
+                    }
+                } catch (error) {
+                    console.error('自动刷新检查失败:', error);
+                }
+            }, 5000); // 5秒检查一次
+        }
+        
+        // 停止自动刷新
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+        
+        // 加载好友列表
+        async function loadFriendsList() {
+            const friendsList = document.getElementById('friends-list');
+            friendsList.innerHTML = '<div class="loading">加载中...</div>';
+            
+            try {
+                const friends = await friendshipAPI.getFriendsList(currentUser.id);
+                lastFriendsCount = friends.length; // 更新计数
+                
+                if (friends.length === 0) {
+                    friendsList.innerHTML = '<div class="empty-state">暂无好友</div>';
+                    return;
+                }
+                
+                friendsList.innerHTML = friends.map(friend => `
+                    <div class="friend-item">
+                        <div class="friend-avatar">${friend.friend_nickname ? friend.friend_nickname.charAt(0) : '?'}</div>
+                        <div class="friend-info">
+                            <div class="friend-name">${friend.friend_nickname || '未知用户'}</div>
+                            <div class="friend-id">@${friend.friend_unique_id}</div>
+                        </div>
+                        <div class="friend-actions">
+                            <button class="friend-action-btn remove" onclick="removeFriend('${friend.friend_id}')">删除</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('加载好友列表失败:', error);
+                friendsList.innerHTML = '<div class="empty-state">加载失败，请重试</div>';
+            }
+        }
+        
+        // 加载好友请求
+        async function loadFriendRequests() {
+            const requestsList = document.getElementById('friend-requests-list');
+            requestsList.innerHTML = '<div class="loading">加载中...</div>';
+            
+            try {
+                const requests = await friendshipAPI.getReceivedRequests(currentUser.id);
+                lastRequestsCount = requests.length; // 更新计数
+                
+                if (requests.length === 0) {
+                    requestsList.innerHTML = '<div class="empty-state">暂无好友请求</div>';
+                    return;
+                }
+                
+                requestsList.innerHTML = requests.map(request => `
+                    <div class="friend-item">
+                        <div class="friend-avatar">${request.sender_nickname ? request.sender_nickname.charAt(0) : '?'}</div>
+                        <div class="friend-info">
+                            <div class="friend-name">${request.sender_nickname || '未知用户'}</div>
+                            <div class="friend-id">@${request.sender_unique_id}</div>
+                            <div class="friend-message">${request.message || '请求添加您为好友'}</div>
+                        </div>
+                        <div class="friend-actions">
+                            <button class="friend-action-btn accept" onclick="acceptFriendRequest('${request.request_id}')">接受</button>
+                            <button class="friend-action-btn reject" onclick="rejectFriendRequest('${request.request_id}')">拒绝</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('加载好友请求失败:', error);
+                requestsList.innerHTML = '<div class="empty-state">加载失败，请重试</div>';
+            }
+        }
+        
+        // 删除好友
+        window.removeFriend = async function(friendId) {
+            if (!confirm('确定要删除这个好友吗？')) {
+                return;
+            }
+            
+            try {
+                console.log('删除好友:', currentUser.id, '->', friendId);
+                await friendshipAPI.removeFriend(currentUser.id, friendId);
+                alert('好友删除成功');
+                loadFriendsList();
+            } catch (error) {
+                console.error('删除好友失败:', error);
+                alert('删除好友失败，请重试');
+            }
+        };
+        
+        // 接受好友请求
+        window.acceptFriendRequest = async function(requestId) {
+            try {
+                console.log('接受好友请求:', requestId, '接收者:', currentUser.id);
+                const result = await friendshipAPI.acceptFriendRequest(requestId, currentUser.id);
+                alert('好友请求已接受');
+                loadFriendRequests();
+                loadFriendsList();
+                
+                // 显示成功消息，提示用户刷新
+                const successDiv = document.createElement('div');
+                successDiv.style.cssText = 'background: #d4edda; color: #155724; padding: 12px; border-radius: 6px; margin-bottom: 16px; text-align: center;';
+                successDiv.innerHTML = '好友请求已接受！新好友已添加到您的好友列表中。';
+                document.getElementById('friends-list-tab').insertBefore(successDiv, document.getElementById('friends-list'));
+                setTimeout(() => successDiv.remove(), 3000);
+                
+            } catch (error) {
+                console.error('接受好友请求失败:', error);
+                alert('接受好友请求失败，请重试');
+            }
+        };
+        
+        // 拒绝好友请求
+        window.rejectFriendRequest = async function(requestId) {
+            try {
+                console.log('拒绝好友请求:', requestId, '接收者:', currentUser.id);
+                await friendshipAPI.rejectFriendRequest(requestId, currentUser.id);
+                alert('好友请求已拒绝');
+                loadFriendRequests();
+            } catch (error) {
+                console.error('拒绝好友请求失败:', error);
+                alert('拒绝好友请求失败，请重试');
+            }
+        };
+        
+        // 搜索用户
+        window.searchUser = async function() {
+            const userId = document.getElementById('search-user-id').value.trim();
+            const searchResult = document.getElementById('search-result');
+            
+            if (!userId) {
+                alert('请输入用户唯一ID');
+                return;
+            }
+            
+            searchResult.innerHTML = '<div class="loading">搜索中...</div>';
+            
+            try {
+                console.log('搜索用户:', userId, '当前用户ID:', currentUser.id);
+                const user = await friendshipAPI.getUserByUniqueId(userId, currentUser.id);
+                console.log('搜索结果:', user);
+                
+                if (!user) {
+                    searchResult.innerHTML = '<div class="empty-state">未找到该用户</div>';
+                    return;
+                }
+                
+                // 检查是否已经是好友
+                console.log('检查好友关系:', currentUser.id, user.id);
+                const isFriend = await friendshipAPI.checkFriendship(currentUser.id, user.id);
+                console.log('是否已是好友:', isFriend);
+                
+                searchResult.innerHTML = `
+                    <div class="friend-item">
+                        <div class="friend-avatar">${user.nickname ? user.nickname.charAt(0) : '?'}</div>
+                        <div class="friend-info">
+                            <div class="friend-name">${user.nickname || '未知用户'}</div>
+                            <div class="friend-id">@${user.unique_id}</div>
+                        </div>
+                        <div class="friend-actions">
+                            ${isFriend ? 
+                                '<span style="color: #52c41a;">已是好友</span>' : 
+                                '<button class="friend-action-btn send" onclick="sendFriendRequest(\'' + user.id + '\')">发送请求</button>'
+                            }
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                console.error('搜索用户失败:', error);
+                searchResult.innerHTML = '<div class="empty-state">搜索失败，请重试</div>';
+            }
+        };
+        
+        // 发送好友请求
+        window.sendFriendRequest = async function(userId) {
+            try {
+                console.log('发送好友请求:', currentUser.id, '->', userId);
+                await friendshipAPI.sendFriendRequest(currentUser.id, userId, '你好，我想加你为好友');
+                alert('好友请求已发送');
+                document.getElementById('search-result').innerHTML = '<div class="empty-state">请求已发送，等待对方回复</div>';
+            } catch (error) {
+                console.error('发送好友请求失败:', error);
+                alert('发送好友请求失败，请重试');
+            }
+        };
+        
+        // 绑定好友管理事件
+        function bindFriendsEvents() {
+            // 好友模态框关闭按钮
+            document.getElementById('friends-modal-close').addEventListener('click', () => {
+                hideModal('friends-modal');
+                stopAutoRefresh(); // 停止自动刷新
+            });
+            
+            // 个人信息模态框关闭按钮
+            document.getElementById('profile-modal-close').addEventListener('click', () => {
+                hideModal('profile-modal');
+            });
+            
+            // 标签页切换
+            document.querySelectorAll('.friends-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // 移除所有活动状态
+                    document.querySelectorAll('.friends-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.friends-tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // 添加当前活动状态
+                    tab.classList.add('active');
+                    const tabId = tab.getAttribute('data-tab') + '-tab';
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+            
+            // 搜索用户按钮
+            document.getElementById('search-user-btn').addEventListener('click', searchUser);
+            
+            // 搜索框回车事件
+            document.getElementById('search-user-id').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    searchUser();
+                }
+            });
         }
     </script>
 </body>
