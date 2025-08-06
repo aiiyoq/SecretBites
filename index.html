@@ -483,10 +483,10 @@
         .friend-badge {
             font-size: 10px;
             color: #666;
-            background: #e6f7ff;
+            background: rgba(255,192,203,0.85);
             padding: 1px 4px;
             border-radius: 3px;
-            border: 1px solid #91d5ff;
+            border: none;
         }
         
         .info-panel-value-container {
@@ -1611,11 +1611,24 @@
                 // 加载好友的评分
                 const friendsReviews = await loadFriendsReviews();
                 
-                // 合并所有评分
-                window.ratedPois = [...myReviews, ...friendsReviews];
+                // 合并所有评分，确保好友评分有正确的标记
+                window.ratedPois = [
+                    ...myReviews.map(review => ({...review, is_friend_review: false})),
+                    ...friendsReviews.map(review => ({...review, is_friend_review: true}))
+                ];
                 
-                // 更新用户筛选器
+                // 更新用户筛选器（但不重置现有的选择状态）
+                const currentUserFilters = {...userFilterState};
                 await updateUserFilters();
+                // 恢复之前的选择状态
+                Object.keys(currentUserFilters).forEach(key => {
+                    if (userFilterState.hasOwnProperty(key)) {
+                        userFilterState[key] = currentUserFilters[key];
+                    }
+                });
+                
+                // 更新筛选状态
+                updateFilterState();
                 
             } catch (error) {
                 console.error('加载评分数据错误:', error);
@@ -1772,7 +1785,8 @@
             }
             
             // 立即更新本地数据和UI，提供即时反馈
-            const idx = window.ratedPois.findIndex(f => f.uid === poi.uid);
+            // 只查找自己的评分，不影响好友的评分
+            const idx = window.ratedPois.findIndex(f => f.uid === poi.uid && f.user_id === currentUser.id);
             const title = getPoiField(poi, ['title', 'name']);
             const shortTitle = getShortTitle(title);
             const address = getPoiField(poi, ['address', 'addr']);
@@ -1793,22 +1807,23 @@
                     tags: tags,
                     rate: rate,
                     user_id: currentUser.id,
+                    is_friend_review: false,  // 确保这是自己的评分
                     review_id: null, // 临时设为null，保存后更新
                     created_at: new Date().toISOString(),
                     updated_at: new Date().toISOString()
                 };
                 window.ratedPois.push(newPoi);
                 
-                // 清除筛选缓存
-                clearFilterCache();
-                
                 // 立即更新UI
-                updateSingleMarker(newPoi);
+                updateFilterState();
+                updateMapMarkers();
                 if (currentView === 'list') {
                     updateInfoPanel(null, 'list');
                 }
                 if (currentView === 'detail' && currentPoi && currentPoi.uid === poi.uid) {
-                    updateInfoPanel(poi, 'detail');
+                    // 使用更新后的评分数据更新面板
+                    const updatedPoi = window.ratedPois.find(p => p.uid === poi.uid && p.user_id === currentUser.id) || poi;
+                    updateInfoPanel(updatedPoi, 'detail');
                 }
             } else {
                 // 更新评分 - 立即更新本地数据
@@ -1822,16 +1837,16 @@
                 window.ratedPois[idx].tags = tags;
                 window.ratedPois[idx].updated_at = new Date().toISOString();
                 
-                // 清除筛选缓存
-                clearFilterCache();
-                
                 // 立即更新UI
-                updateSingleMarker(window.ratedPois[idx]);
+                updateFilterState();
+                updateMapMarkers();
                 if (currentView === 'list') {
                     updateInfoPanel(null, 'list');
                 }
                 if (currentView === 'detail' && currentPoi && currentPoi.uid === poi.uid) {
-                    updateInfoPanel(poi, 'detail');
+                    // 使用更新后的评分数据更新面板
+                    const updatedPoi = window.ratedPois.find(p => p.uid === poi.uid && p.user_id === currentUser.id) || poi;
+                    updateInfoPanel(updatedPoi, 'detail');
                 }
             }
             
@@ -1859,7 +1874,8 @@
                 } else {
                     window.ratedPois[idx].rate = oldRate;
                 }
-                renderRatedMarkers(); // 重新渲染以回滚UI
+                updateFilterState();
+                updateMapMarkers(); // 重新渲染以回滚UI
                 alert('保存评分失败，请重试');
             }
         }
@@ -1871,20 +1887,13 @@
                 return;
             }
             
-            // 立即从本地数据移除并更新UI
-            const removedPoi = window.ratedPois.find(f => f.uid === uid);
-            window.ratedPois = window.ratedPois.filter(f => f.uid !== uid);
-            
-            // 清除筛选缓存
-            clearFilterCache();
-            
-            // 立即移除地图标记
-            if (window.ratedMarkers[uid]) {
-                map.removeOverlay(window.ratedMarkers[uid]);
-                delete window.ratedMarkers[uid];
-            }
+            // 立即从本地数据移除并更新UI（只移除自己的评分）
+            const removedPoi = window.ratedPois.find(f => f.uid === uid && f.user_id === currentUser.id);
+            window.ratedPois = window.ratedPois.filter(f => !(f.uid === uid && f.user_id === currentUser.id));
             
             // 立即更新UI
+            updateFilterState();
+            updateMapMarkers();
             if (currentView === 'list') {
                 updateInfoPanel(null, 'list');
             }
@@ -1909,7 +1918,8 @@
                 // 如果删除失败，恢复本地数据
                 if (removedPoi) {
                     window.ratedPois.push(removedPoi);
-                    updateSingleMarker(removedPoi);
+                    updateFilterState();
+                    updateMapMarkers();
                 }
                 if (currentView === 'list') {
                     updateInfoPanel(null, 'list');
@@ -1921,140 +1931,209 @@
             }
         }
 
-        // ===================== 视图渲染 =====================
-        function getRatedSvg(rate) {
+        // ===================== 地图标记管理 =====================
+        
+        // 全局标记存储
+        window.mapMarkers = {
+            rated: {},      // 评分标记
+            nicknames: {},  // 昵称标签
+            search: []      // 搜索标记
+        };
+        
+        // 筛选状态
+        window.filterState = {
+            rates: [],    // 选中的评分类型
+            users: []     // 选中的用户ID
+        };
+        
+        // 创建评分标记的SVG图标
+        function createRatedSvg(rate) {
             const type = RATE_TYPES.find(t => t.value === rate) || RATE_TYPES[1];
             return `<svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
                 <path d="M16 40C16 40 32 24.5685 32 16C32 7.16344 24.8366 0 16 0C7.16344 0 0 7.16344 0 16C0 24.5685 16 40 16 40Z" fill="${type.drop}"/>
                 <path d="M16 8L18.47 13.53L24 14.18L20 18.24L21.24 24L16 21.24L10.76 24L12 18.24L8 14.18L13.53 13.53L16 8Z" fill="${type.star}"/>
             </svg>`;
         }
-        function renderRatedMarkers() {
-            if(window.ratedMarkers) Object.values(window.ratedMarkers).forEach(marker => map.removeOverlay(marker));
-            window.ratedMarkers = {};
+        
+        // 清除所有地图标记
+        function clearAllMapMarkers() {
+            // 清除评分标记
+            Object.values(window.mapMarkers.rated).forEach(marker => {
+                map.removeOverlay(marker);
+            });
+            window.mapMarkers.rated = {};
             
-            // 清除之前的昵称标签
-            if(window.nicknameLabels) {
-                Object.values(window.nicknameLabels).forEach(label => map.removeOverlay(label));
-                window.nicknameLabels = {};
-            }
+            // 清除昵称标签
+            Object.values(window.mapMarkers.nicknames).forEach(label => {
+                map.removeOverlay(label);
+            });
+            window.mapMarkers.nicknames = {};
             
-            // 使用筛选后的数据来渲染标记
-            const filteredPois = getFilteredRatedPois();
+            // 清除搜索标记
+            window.mapMarkers.search.forEach(marker => {
+                map.removeOverlay(marker);
+            });
+            window.mapMarkers.search = [];
+        }
+        
+        // 获取应该显示的评分点
+        function getVisibleRatedPois() {
+            const { rates, users } = window.filterState;
             
-            filteredPois.forEach(poi => {
-                if (!poi.point || typeof poi.point.lng !== 'number' || typeof poi.point.lat !== 'number') return;
-                const pt = new BMapGL.Point(poi.point.lng, poi.point.lat);
-                const svg = getRatedSvg(poi.rate);
-                const svgUrl = 'data:image/svg+xml;base64,' + btoa(svg);
-                const icon = new BMapGL.Icon(svgUrl, new BMapGL.Size(32, 40), { anchor: new BMapGL.Size(16, 40) });
-                const marker = new BMapGL.Marker(pt, {icon: icon});
-                const label = new BMapGL.Label(poi.shortTitle || poi.title, { offset: new BMapGL.Size(20, -10) });
-                label.setStyle({
-                    color: '#333', fontSize: '14px', background: 'rgba(255,255,255,0.85)',
-                    border: 'none', padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold', zIndex: 999
-                });
-                marker.setLabel(label);
+            console.log('Filtering POIs with state:', { rates, users, totalPois: window.ratedPois.length });
+            
+            let filteredPois = window.ratedPois.filter(poi => {
+                // 评分类型筛选 - 如果没有选中任何评分类型，则不显示任何数据
+                const rateMatch = rates.length > 0 && rates.includes(poi.rate);
+                // 用户筛选 - 如果没有选中任何用户，则不显示任何数据
+                const userMatch = users.length > 0 && users.includes(poi.user_id);
                 
-                // 为好友评分添加昵称标签（作为独立的overlay）
-                if (poi.is_friend_review && poi.friend_nickname) {
-                    const nicknameLabel = new BMapGL.Label(poi.friend_nickname, { offset: new BMapGL.Size(-30, -50) });
-                    nicknameLabel.setStyle({
-                        color: '#666', fontSize: '10px', background: 'rgba(230,247,255,0.9)',
-                        border: '1px solid #91d5ff', padding: '1px 4px', borderRadius: '3px', 
-                        fontWeight: 'normal', zIndex: 1000, whiteSpace: 'nowrap'
-                    });
-                    // 将昵称标签作为独立的overlay添加到地图
-                    map.addOverlay(nicknameLabel);
-                    // 保存昵称标签引用，以便后续移除
-                    if (!window.nicknameLabels) window.nicknameLabels = {};
-                    window.nicknameLabels[poi.uid] = nicknameLabel;
-                }
+                const shouldShow = rateMatch && userMatch;
+                console.log(`POI ${poi.title}: rateMatch=${rateMatch}, userMatch=${userMatch}, shouldShow=${shouldShow}`);
                 
-                map.addOverlay(marker);
-                window.ratedMarkers[poi.uid] = marker;
-                marker.addEventListener('click', function() {
-                    showPoiInfoWindow(poi, marker);
-                });
+                return shouldShow;
+            });
+            
+            console.log('Filtered POIs count:', filteredPois.length);
+            
+            // 按照RATE_TYPES的顺序进行排序，确保与筛选器顺序一致
+            return filteredPois.sort((a, b) => {
+                const indexA = RATE_TYPES.findIndex(t => t.value === a.rate);
+                const indexB = RATE_TYPES.findIndex(t => t.value === b.rate);
+                return indexA - indexB;
             });
         }
         
-        // 优化：只更新单个标记，而不是重新渲染所有标记
-        function updateSingleMarker(poi) {
-            if (!poi.point || typeof poi.point.lng !== 'number' || typeof poi.point.lat !== 'number') return;
+        // 更新地图标记
+        function updateMapMarkers() {
+            console.log('Updating map markers with filter state:', window.filterState);
             
-            // 检查是否应该显示这个标记（基于筛选条件）
-            const filteredPois = getFilteredRatedPois();
-            const shouldShow = filteredPois.some(fp => fp.uid === poi.uid);
-            
-            // 如果标记已存在，先移除
-            if (window.ratedMarkers[poi.uid]) {
-                map.removeOverlay(window.ratedMarkers[poi.uid]);
-                delete window.ratedMarkers[poi.uid];
-            }
-            
-            // 如果昵称标签已存在，也移除
-            if (window.nicknameLabels && window.nicknameLabels[poi.uid]) {
-                map.removeOverlay(window.nicknameLabels[poi.uid]);
-                delete window.nicknameLabels[poi.uid];
-            }
-            
-            // 如果应该显示，则添加新标记
-            if (shouldShow) {
-                const pt = new BMapGL.Point(poi.point.lng, poi.point.lat);
-                const svg = getRatedSvg(poi.rate);
-                const svgUrl = 'data:image/svg+xml;base64,' + btoa(svg);
-                const icon = new BMapGL.Icon(svgUrl, new BMapGL.Size(32, 40), { anchor: new BMapGL.Size(16, 40) });
-                const marker = new BMapGL.Marker(pt, {icon: icon});
-                const label = new BMapGL.Label(poi.shortTitle || poi.title, { offset: new BMapGL.Size(20, -10) });
-                label.setStyle({
-                    color: '#333', fontSize: '14px', background: 'rgba(255,255,255,0.85)',
-                    border: 'none', padding: '2px 8px', borderRadius: '4px', fontWeight: 'bold', zIndex: 999
+            // 彻底清除所有评分相关的标记和标签
+            if (window.mapMarkers.rated) {
+                console.log('Clearing rated markers:', Object.keys(window.mapMarkers.rated).length, 'keys:', Object.keys(window.mapMarkers.rated));
+                Object.values(window.mapMarkers.rated).forEach(marker => {
+                    if (marker && map) {
+                        map.removeOverlay(marker);
+                    }
                 });
-                marker.setLabel(label);
-                
-                // 为好友评分添加昵称标签（作为独立的overlay）
-                if (poi.is_friend_review && poi.friend_nickname) {
-                    const nicknameLabel = new BMapGL.Label(poi.friend_nickname, { offset: new BMapGL.Size(-8, -35) });
-                    nicknameLabel.setStyle({
-                        color: '#666', fontSize: '10px', background: 'rgba(230,247,255,0.9)',
-                        border: '1px solid #91d5ff', padding: '1px 4px', borderRadius: '3px', 
-                        fontWeight: 'normal', zIndex: 1000, whiteSpace: 'nowrap'
-                    });
-                    // 将昵称标签作为独立的overlay添加到地图
-                    map.addOverlay(nicknameLabel);
-                    // 保存昵称标签引用，以便后续移除
-                    if (!window.nicknameLabels) window.nicknameLabels = {};
-                    window.nicknameLabels[poi.uid] = nicknameLabel;
-                }
-                
-                map.addOverlay(marker);
-                window.ratedMarkers[poi.uid] = marker;
-                marker.addEventListener('click', function() {
-                    showPoiInfoWindow(poi, marker);
+                window.mapMarkers.rated = {};
+            }
+            
+            if (window.mapMarkers.nicknames) {
+                console.log('Clearing nickname labels:', Object.keys(window.mapMarkers.nicknames).length, 'keys:', Object.keys(window.mapMarkers.nicknames));
+                Object.values(window.mapMarkers.nicknames).forEach(label => {
+                    if (label && map) {
+                        map.removeOverlay(label);
+                    }
                 });
+                window.mapMarkers.nicknames = {};
             }
+            
+            // 获取要显示的数据
+            const visiblePois = getVisibleRatedPois();
+            console.log('Visible POIs:', visiblePois.length);
+            
+            // 创建新标记
+            visiblePois.forEach(poi => {
+                createRatedMarker(poi);
+            });
+            
+            console.log('Final marker counts - rated:', Object.keys(window.mapMarkers.rated).length, 'nicknames:', Object.keys(window.mapMarkers.nicknames).length);
         }
-        function clearPoiMarkers() {
-            if (window._poiMarkers) {
-                window._poiMarkers.forEach(m => map.removeOverlay(m));
+        
+        // 创建单个评分标记
+        function createRatedMarker(poi) {
+            if (!poi.point || typeof poi.point.lng !== 'number' || typeof poi.point.lat !== 'number') {
+                return;
             }
-            window._poiMarkers = [];
-        }
-        function getCheckedRates() {
-            // 使用信息面板的筛选状态，如果没有则使用保存的状态
-            const infoPanelFilters = document.querySelectorAll('.rate-filter:checked');
-            if (infoPanelFilters.length > 0) {
-                return Array.from(infoPanelFilters).map(cb => cb.value);
+            
+            const pt = new BMapGL.Point(poi.point.lng, poi.point.lat);
+            
+            // 创建标记图标
+            const svg = createRatedSvg(poi.rate);
+            const svgUrl = 'data:image/svg+xml;base64,' + btoa(svg);
+            const icon = new BMapGL.Icon(svgUrl, new BMapGL.Size(32, 40), { 
+                anchor: new BMapGL.Size(16, 40) 
+            });
+            
+            // 创建标记
+            const marker = new BMapGL.Marker(pt, { icon: icon });
+            
+            // 创建餐厅名称标签
+            const label = new BMapGL.Label(poi.shortTitle || poi.title, { 
+                offset: new BMapGL.Size(20, -10) 
+            });
+            label.setStyle({
+                color: '#333',
+                fontSize: '14px',
+                background: 'rgba(255,255,255,0.85)',
+                border: 'none',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                fontWeight: 'bold',
+                zIndex: 999
+            });
+            marker.setLabel(label);
+            
+            // 为好友评分添加昵称标签
+            if (poi.is_friend_review && poi.friend_nickname) {
+                const nicknameLabel = new BMapGL.Label(`👤 ${poi.friend_nickname}`, {
+                    position: pt,
+                    offset: new BMapGL.Size(20, -30)
+                });
+                nicknameLabel.setStyle({
+                    color: '#333',
+                    fontSize: '10px',
+                    background: 'rgba(255,192,203,0.85)',
+                    border: 'none',
+                    padding: '1px 4px',
+                    borderRadius: '4px',
+                    fontWeight: 'normal',
+                    zIndex: 999,
+                    whiteSpace: 'nowrap'
+                });
+                
+                map.addOverlay(nicknameLabel);
+                // 使用唯一的key避免覆盖
+                const nicknameKey = `${poi.uid}_${poi.user_id}`;
+                window.mapMarkers.nicknames[nicknameKey] = nicknameLabel;
             }
-            // 如果没有找到信息面板的筛选器，使用保存的状态
-            return Object.keys(listFilterState).filter(key => listFilterState[key]);
+            
+            // 添加点击事件
+            marker.addEventListener('click', function() {
+                showPoiInfoWindow(poi, marker);
+            });
+            
+            // 添加到地图
+            map.addOverlay(marker);
+            // 使用唯一的key避免覆盖
+            const markerKey = `${poi.uid}_${poi.user_id}`;
+            window.mapMarkers.rated[markerKey] = marker;
         }
+        
+        // 更新筛选状态
+        function updateFilterState() {
+            // 获取选中的评分类型
+            const checkedRates = Object.keys(listFilterState).filter(key => listFilterState[key]);
+            
+            // 获取选中的用户ID
+            const checkedUserIds = Object.keys(userFilterState)
+                .filter(key => userFilterState[key])
+                .map(key => userFilterMapping[key]);
+            
+            window.filterState = {
+                rates: checkedRates,
+                users: checkedUserIds
+            };
+            
+            console.log('Filter state updated:', window.filterState);
+        }
+        
+        // 更新地图视口以显示评分点
         function updateMapViewportForRatedPois() {
-            // 使用筛选后的数据来更新地图视口
-            const filteredPois = getFilteredRatedPois();
-            if (filteredPois && filteredPois.length > 0) {
-                const points = filteredPois
+            const visiblePois = getVisibleRatedPois();
+            if (visiblePois && visiblePois.length > 0) {
+                const points = visiblePois
                     .filter(poi => poi.point && typeof poi.point.lng === 'number' && typeof poi.point.lat === 'number')
                     .map(poi => new BMapGL.Point(poi.point.lng, poi.point.lat));
                 if (points.length > 0) {
@@ -2071,6 +2150,15 @@
                     ]);
                 }
             }
+        }
+        
+        // 清除搜索标记
+        function clearPoiMarkers() {
+            // 清除搜索标记
+            window.mapMarkers.search.forEach(marker => {
+                map.removeOverlay(marker);
+            });
+            window.mapMarkers.search = [];
         }
 
         // ===================== 信息窗口 =====================
@@ -2120,7 +2208,7 @@
                 if (poi && poi.point) {
                     const marker = createPoiMarker(poi);
                     map.addOverlay(marker);
-                    window._poiMarkers.push(marker);
+                    window.mapMarkers.search.push(marker);
                     points.push(poi.point);
                     searchResults.push(poi);
                 }
@@ -2128,7 +2216,6 @@
             if (points.length > 0) {
                 map.setViewport(points);
             }
-            renderRatedMarkers();
             // 分页累加
             if (currentSearchPage === 0) {
                 currentSearchResults = searchResults;
@@ -2163,15 +2250,68 @@
             // 退出登录按钮点击事件
             document.getElementById('logout-btn').addEventListener('click', () => {
                 if (confirm('确定要退出登录吗？')) {
-                    clearUserSession();
-                    // 清空评分数据
+                    // 在清除会话之前重置所有状态
                     window.ratedPois = [];
-                    // 重置用户筛选状态
-                    userFilterState['自己'] = null;
-                    userFilterMapping['自己'] = null;
-                    renderRatedMarkers();
-                    updateMapViewportForRatedPois();
-                    updateInfoPanel(null, 'list');
+                    currentPoi = null;
+                    currentView = 'list';
+                    currentSearchResults = [];
+                    previousView = 'list';
+                    currentSearchKeyword = '';
+                    currentSearchPage = 0;
+                    hasMoreSearchResults = false;
+                    
+                    // 重置筛选器状态
+                    listFilterState = {
+                        '超爱': true,
+                        '喜欢': true,
+                        '一般': true,
+                        '不会再去了': true
+                    };
+                    userFilterState = {};
+                    userFilterMapping = {};
+                    
+                    // 清除地图标记
+                    clearAllMapMarkers();
+                    
+                    // 重置地图视口到默认状态
+                    map.centerAndZoom(new BMapGL.Point(116.404, 39.915), 11);
+                    
+                    // 重置筛选状态
+                    window.filterState = {
+                        rates: [],
+                        users: []
+                    };
+                    
+                    // 清除会话
+                    clearUserSession();
+                    
+                    // 重置信息面板到初始状态
+                    const panelContent = document.getElementById('info-panel-content');
+                    panelContent.innerHTML = `
+                        <div class="info-panel-section">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <h3>🍽️ 餐厅评分</h3>
+                                <button class="info-panel-btn" onclick="updateInfoPanel(null, 'stats')">统计</button>
+                            </div>
+                            
+                            <div class="filter-bar" id="filter-bar">
+                                <div class="filter-bar-header" onclick="toggleFilterBar()">
+                                    <div class="filter-bar-title">
+                                        🔍 筛选条件
+                                        <span class="filter-summary">4个评分类型, 0个用户</span>
+                                    </div>
+                                    <div class="filter-bar-toggle">▼</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-panel-section">
+                            <h4>餐厅列表 (0个)</h4>
+                            <div class="restaurant-list">
+                                <div style="text-align: center; color: #999; padding: 20px;">暂无评分餐厅</div>
+                            </div>
+                        </div>
+                    `;
                     
                     // 显示退出提示
                     if (currentView === 'list') {
@@ -2267,7 +2407,8 @@
                             // 加载用户评分数据
                             await loadRatedPois();
                             await updateUserFilters(); // 更新用户筛选器
-                            renderRatedMarkers();
+                            updateFilterState();
+                            updateMapMarkers();
                             updateMapViewportForRatedPois();
                             updateInfoPanel(null, 'list'); // 新增：登录后立即刷新评分列表
                         
@@ -2353,7 +2494,8 @@
                             // 加载用户评分数据
                             await loadRatedPois();
                             await updateUserFilters(); // 更新用户筛选器
-                            renderRatedMarkers();
+                            updateFilterState();
+                            updateMapMarkers();
                             updateMapViewportForRatedPois();
                             updateInfoPanel(null, 'list'); // 新增：注册后立即刷新评分列表
                         
@@ -2612,7 +2754,7 @@
                                     <div class="restaurant-item" onclick="showSearchResultDetail('${poi.uid}')">
                                         <div class="restaurant-header">
                                             <span class="restaurant-name">${shortTitle || title || ''}</span>
-                                            ${ratedPoi ? `<span class="restaurant-rate" style="color: ${rateType?.drop || '#666'}">${ratedPoi.rate}</span>` : ''}
+                                            ${ratedPoi ? `<span class="restaurant-rate" style="color: ${rateType?.drop || '#666'}; white-space: nowrap;">${ratedPoi.rate}</span>` : ''}
                                         </div>
                                         <div class="restaurant-location">${city || ''}${area ? ' · ' + area : ''}</div>
                                         <div class="restaurant-address">${address || ''}</div>
@@ -2630,7 +2772,7 @@
             } else if (view === 'list') {
                 // 显示餐厅列表
                 currentView = 'list';
-                const filteredPois = getFilteredRatedPois();
+                const filteredPois = getVisibleRatedPois();
                 
                 panelContent.innerHTML = `
                     <div class="info-panel-section">
@@ -2725,7 +2867,7 @@
                                                 <span class="restaurant-name">${poi.shortTitle || poi.title}</span>
                                                 <div class="restaurant-rate-container">
                                                     ${isFriendReview ? `<span class="friend-badge">👤 ${reviewerName}</span>` : ''}
-                                                    <span class="restaurant-rate" style="color: ${rateType?.drop || '#666'}">${poi.rate}</span>
+                                                    <span class="restaurant-rate" style="color: ${rateType?.drop || '#666'}; white-space: nowrap;">${poi.rate}</span>
                                                 </div>
                                             </div>
                                             <div class="restaurant-location">${poi.city || ''}${poi.area ? ' · ' + poi.area : ''}</div>
@@ -2767,10 +2909,21 @@
                 const tags = getPoiField(poi, ['tags', 'std_tag', 'tag']) || [];
                 const tagArray = Array.isArray(tags) ? tags : (typeof tags === 'string' ? tags.split(',').map(t => t.trim()) : []);
                 
-                // 检查是否已评分
-                const ratedPoi = window.ratedPois.find(rp => rp.uid === poi.uid);
+                // 检查所有相关评分
+                const allReviews = window.ratedPois.filter(rp => rp.uid === poi.uid);
+                // 获取我的评分
+                const myReview = allReviews.find(rp => rp.user_id === currentUser?.id);
+                // 获取所有好友评分
+                const friendReviews = allReviews.filter(rp => rp.is_friend_review && rp.user_id !== currentUser?.id);
+                
+                console.log('Reviews for POI:', {
+                    all: allReviews,
+                    my: myReview,
+                    friends: friendReviews
+                });
                 
                 panelContent.innerHTML = `
+                    <!-- 1. 餐厅详情部分 -->
                     <div class="info-panel-section">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                             <h3>📍 餐厅详情</h3>
@@ -2805,6 +2958,30 @@
                         ` : ''}
                     </div>
                     
+                    <!-- 2. 好友评分部分（仅当有好友评分时显示） -->
+                    ${friendReviews.length > 0 ? `
+                    <div class="info-panel-section">
+                        <h3>👥 好友评分</h3>
+                        ${friendReviews.map(friendReview => `
+                            <div class="info-panel-item">
+                                <span class="info-panel-label">${friendReview.friend_nickname}</span>
+                                <div class="info-panel-value-container">
+                                    <span class="info-panel-value" style="color: ${RATE_TYPES.find(t => t.value === friendReview.rate)?.drop || '#666'}; white-space: nowrap;">${friendReview.rate}</span>
+                                </div>
+                            </div>
+                            ${friendReview.review_text ? `
+                            <div class="info-panel-item" style="margin-top: 4px;">
+                                <span class="info-panel-label"></span>
+                                <div class="info-panel-value-container">
+                                    <span class="info-panel-value" style="color: #666; font-size: 12px; font-style: italic;">"${friendReview.review_text}"</span>
+                                </div>
+                            </div>
+                            ` : ''}
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                    
+                    <!-- 3. 评分操作部分 -->
                     <div class="info-panel-section">
                         <h3>⭐ 评分操作</h3>
                         ${!isLoggedIn ? `
@@ -2813,17 +2990,16 @@
                                 <button class="info-panel-btn" onclick="showModal('login-modal')" style="background: #1b8eec; color: #fff;">立即登录</button>
                             </div>
                         ` : `
-                            ${ratedPoi ? `
+                            ${myReview ? `
                                 <div class="info-panel-item">
-                                    <span class="info-panel-label">当前评分</span>
+                                    <span class="info-panel-label">我的评分</span>
                                     <div class="info-panel-value-container">
-                                        <span class="info-panel-value" style="color: ${RATE_TYPES.find(t => t.value === ratedPoi.rate)?.drop || '#666'}">${ratedPoi.rate}</span>
-                                        ${ratedPoi.is_friend_review ? `<span class="friend-badge">👤 ${ratedPoi.friend_nickname}</span>` : ''}
+                                        <span class="info-panel-value" style="color: ${RATE_TYPES.find(t => t.value === myReview.rate)?.drop || '#666'}; white-space: nowrap;">${myReview.rate}</span>
                                     </div>
                                 </div>
                             ` : `
                                 <div class="info-panel-item">
-                                    <span class="info-panel-label">当前评分</span>
+                                    <span class="info-panel-label">我的评分</span>
                                     <span class="info-panel-value" style="color: #999;">未评分</span>
                                 </div>
                             `}
@@ -2831,7 +3007,7 @@
                                 ${RATE_TYPES.map(t => `
                                     <button class="info-panel-btn rate-btn" data-rate="${t.value}" style="background:${t.drop};color:${t.star === 'black' ? '#000' : '#fff'};margin-right:8px;margin-bottom:8px;">${t.value}</button>
                                 `).join('')}
-                                ${ratedPoi ? `
+                                ${myReview ? `
                                     <button class="info-panel-btn" id="remove-rate-btn" style="background:#bbb;color:#fff;margin-bottom:8px;">取消评价</button>
                                 ` : ''}
                             </div>
@@ -2869,7 +3045,12 @@
                         btn.disabled = true;
                         
                         try {
+                            console.log('Adding rating:', { poi, rate });
+                            // 创建新的评分数据，确保是自己的评分
                             await addOrUpdateRatedPoi(poi, rate);
+                            // 更新筛选状态和地图标记
+                            updateFilterState();
+                            updateMapMarkers();
                         } finally {
                             // 恢复按钮状态
                             btn.textContent = originalText;
@@ -2944,56 +3125,28 @@
         // 保存筛选条展开状态
         let filterBarExpanded = false;
         
-        // 缓存筛选结果以提高性能
-        let filteredPoisCache = null;
-        let lastFilterState = null;
-        
-        function getFilteredRatedPois() {
-            // 检查筛选状态是否发生变化
-            const currentFilterState = JSON.stringify({
-                listFilterState,
-                userFilterState,
-                ratedPoisLength: window.ratedPois.length
-            });
+        // 初始化筛选状态 - 默认全选
+        function initializeFilterState() {
+            // 评分筛选状态 - 默认全选
+            listFilterState = {
+                '超爱': true,
+                '喜欢': true,
+                '一般': true,
+                '不会再去了': true
+            };
             
-            // 如果筛选状态没有变化且缓存存在，直接返回缓存
-            if (lastFilterState === currentFilterState && filteredPoisCache !== null) {
-                return filteredPoisCache;
-            }
+            // 用户筛选状态 - 默认只选自己
+            userFilterState = {
+                self: true
+            };
             
-            // 使用保存的状态进行筛选，不再从DOM读取
-            const checkedRates = Object.keys(listFilterState).filter(key => listFilterState[key]);
-            const checkedUserIds = Object.keys(userFilterState).filter(key => userFilterState[key]).map(key => userFilterMapping[key]);
+            // 用户映射
+            userFilterMapping = {
+                self: currentUser ? currentUser.id : null
+            };
             
-            // 先按评分筛选
-            let filteredPois = window.ratedPois.filter(poi => checkedRates.includes(poi.rate));
-            
-            // 再按用户ID筛选
-            if (checkedUserIds.length > 0) {
-                filteredPois = filteredPois.filter(poi => poi.user_id && checkedUserIds.includes(poi.user_id));
-            } else {
-                // 如果没有选中任何用户，则不显示任何数据
-                filteredPois = [];
-            }
-            
-            // 按照RATE_TYPES的顺序进行排序，确保与筛选器顺序一致
-            const sortedPois = filteredPois.sort((a, b) => {
-                const indexA = RATE_TYPES.findIndex(t => t.value === a.rate);
-                const indexB = RATE_TYPES.findIndex(t => t.value === b.rate);
-                return indexA - indexB;
-            });
-            
-            // 更新缓存
-            filteredPoisCache = sortedPois;
-            lastFilterState = currentFilterState;
-            
-            return sortedPois;
-        }
-        
-        // 清除筛选缓存（当数据发生变化时调用）
-        function clearFilterCache() {
-            filteredPoisCache = null;
-            lastFilterState = null;
+            // 更新筛选状态
+            updateFilterState();
         }
         
         // 筛选条相关函数
@@ -3020,23 +3173,25 @@
             RATE_TYPES.forEach(type => {
                 listFilterState[type.value] = true;
             });
+            updateFilterState();
             updateInfoPanel(null, 'list');
-            renderRatedMarkers();
+            updateMapMarkers();
         };
         
         window.clearAllRateFilters = function() {
             RATE_TYPES.forEach(type => {
                 listFilterState[type.value] = false;
             });
+            updateFilterState();
             updateInfoPanel(null, 'list');
-            renderRatedMarkers();
+            updateMapMarkers();
         };
         
         window.toggleRateFilter = function(value) {
             listFilterState[value] = !listFilterState[value];
-            clearFilterCache(); // 清除筛选缓存
+            updateFilterState();
             updateInfoPanel(null, 'list');
-            renderRatedMarkers();
+            updateMapMarkers();
         };
         
         // 用户筛选相关函数
@@ -3044,16 +3199,23 @@
             Object.keys(userFilterState).forEach(user => {
                 userFilterState[user] = true;
             });
+            updateFilterState();
             updateInfoPanel(null, 'list');
-            renderRatedMarkers();
+            updateMapMarkers();
         };
         
         window.clearAllUserFilters = function() {
             Object.keys(userFilterState).forEach(user => {
                 userFilterState[user] = false;
             });
+            updateFilterState();
+            console.log('After clearing user filters:', {
+                userFilterState,
+                userFilterMapping,
+                filterState: window.filterState
+            });
             updateInfoPanel(null, 'list');
-            renderRatedMarkers();
+            updateMapMarkers();
         };
         
         window.toggleUserFilter = function(value) {
@@ -3070,9 +3232,9 @@
             
             userFilterState[value] = !userFilterState[value]; // 切换选中状态
             
-            clearFilterCache(); // 清除筛选缓存
+            updateFilterState();
             updateInfoPanel(null, 'list');
-            renderRatedMarkers();
+            updateMapMarkers();
         };
         
         // 兼容旧函数名
@@ -3110,7 +3272,8 @@
                     
                     // 更新本地数据
                     window.ratedPois = [];
-                    renderRatedMarkers();
+                    updateFilterState();
+                    updateMapMarkers();
                     updateInfoPanel(null, 'list');
                 } catch (error) {
                     console.error('清除所有评分失败:', error);
@@ -3169,7 +3332,7 @@
             console.log('用户筛选器映射:', userFilterMapping);
             console.log('当前用户:', currentUser);
             console.log('当前视图:', currentView);
-            console.log('筛选后的餐厅数量:', getFilteredRatedPois().length);
+            console.log('筛选后的餐厅数量:', getVisibleRatedPois().length);
             console.log('总餐厅数量:', window.ratedPois.length);
             console.log('评分数据:', window.ratedPois);
         };
@@ -3189,11 +3352,11 @@
             // 加载用户会话
             loadUserSession();
             
-            // 初始化用户筛选状态
+            // 初始化筛选状态
+            initializeFilterState();
+            
+            // 初始化好友API
             if (isLoggedIn && currentUser) {
-                userFilterState = { self: currentUser.id };
-                userFilterMapping = { self: currentUser.id };
-                // 初始化好友API
                 initFriendshipAPI();
             }
             
@@ -3206,7 +3369,8 @@
             // 如果用户已登录，加载评分数据
             if (isLoggedIn) {
                 await loadRatedPois();
-                renderRatedMarkers();
+                updateFilterState();
+                updateMapMarkers();
                 updateMapViewportForRatedPois();
             }
             

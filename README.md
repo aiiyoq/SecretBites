@@ -1,187 +1,171 @@
-# 餐厅地图评分应用
+# SecretBites：把最爱的餐厅，分享给最亲密的朋友
 
-一个基于百度地图的餐厅搜索和评分应用，支持用户注册、登录和餐厅评分功能。
+## 🍽️ 项目简介
 
-## 功能特性
+**SecretBites** 是一个基于地图标记的私人及好友专属餐厅记录分享工具，瞄准"今天吃什么"的日常难题，以及市面上点评软件刷好评乱象，为用户提供真实可信的美食推荐平台。
 
-### 🗺️ 地图功能
-- 百度地图集成
-- 餐厅搜索功能
-- 评分标记显示
-- 地图交互操作
+## 🎯 产品定位
 
-### 👤 用户系统
-- 用户注册（昵称 + 用户名 + 密码）
-- 用户登录
-- 会话管理
-- 用户状态显示
+### 解决痛点
+- **"今天吃什么"难题**：帮助用户快速找到心仪的餐厅
+- **点评软件乱象**：避免刷好评、虚假评价的干扰
+- **社交分享需求**：与最亲密的朋友分享真实的美食体验
 
-### ⭐ 评分系统
-- 餐厅评分（超爱、喜欢、一般、不会再去了）
-- 评分数据持久化存储
-- 评分列表显示
-- 评分统计功能
-- 评分筛选功能
+### 产品特色
+- **私人专属**：基于真实好友关系的评分系统
+- **地图可视化**：直观的地图标记和位置展示
+- **可信推荐**：只显示好友的真实评分和推荐
 
-### 📱 界面特性
-- 响应式设计
-- 可折叠信息面板
-- 美观的用户界面
-- 实时状态更新
+## 🛠️ 技术实现
 
-## 技术栈
+### 技术架构
+- **前端技术栈**：HTML5 + CSS3 + JavaScript ES6+
+- **后端服务**：Supabase云服务 + PostgreSQL数据库
+- **地图服务**：百度地图API
+- **开发工具**：Cursor AI辅助开发
 
-- **前端**: HTML5, CSS3, JavaScript (ES6+)
-- **地图**: 百度地图 API
-- **数据库**: Supabase (PostgreSQL)
-- **认证**: 自定义用户认证系统
+### 开发流程
+1. **需求分析**：理解用户痛点和产品定位
+2. **功能拆解**：将复杂需求拆解为可实现的模块
+3. **技术选型**：选择合适的技术栈和第三方服务
+4. **快速验证**：借助AI工具快速原型验证
+5. **全栈开发**：独立完成从前端到后端的完整开发
 
-## 文件结构
+### 核心模块
+- **用户认证系统**：注册、登录、会话管理
+- **地图交互模块**：POI搜索、自定义标记、地图操作
+- **评分管理系统**：四级评分体系、评分历史、数据统计
+- **好友共享系统**：好友关系管理、评分分享、社交互动
+
+## 🗺️ GIS特色
+
+### 地图集成
+- **深度集成百度地图API**：实现完整的GIS功能
+- **POI搜索功能**：基于地理位置的餐厅搜索
+- **自定义标记可视化**：不同评分类型的差异化标记
+- **地图交互优化**：缩放、平移、刷新等操作优化
+
+### 地理信息优势
+- **空间数据管理**：餐厅位置信息的精确存储和查询
+- **地理可视化**：直观的地图展示和空间关系表达
+- **位置服务**：基于用户位置的相关推荐
+
+### 用户体验优化
+- **智能缩放**：根据搜索结果自动调整地图视野
+- **标记聚合**：大量标记时的性能优化
+- **响应式地图**：适配不同设备和屏幕尺寸
+
+## 📊 产品成果
+
+### 已实现功能模块
+
+| 功能模块 | 完成度 | 核心特性 |
+|---------|--------|----------|
+| **用户登录** | ✅ 100% | 注册、登录、会话管理、用户状态 |
+| **地图交互** | ✅ 100% | POI搜索、标记显示、地图操作 |
+| **评分管理** | ✅ 100% | 四级评分、历史记录、数据统计 |
+| **好友共享** | ✅ 100% | 好友关系、评分分享、社交互动 |
+
+### 数据模型
+- **用户表**：用户基本信息、认证数据
+- **餐厅表**：POI信息、地理位置、基础数据
+- **评分表**：用户评分、时间戳、评分类型
+- **好友关系表**：双向好友关系、好友请求
+- **好友请求表**：请求状态、消息记录
+
+### 产品验证
+- **全流程验证**：从需求分析到产品落地的完整流程
+- **技术可行性**：验证了技术架构的可行性和稳定性
+- **用户体验**：通过实际使用验证了产品设计的合理性
+
+## 🚀 快速开始
+
+### 在线体验
+**产品链接**：[https://aiiyoq.github.io/SecretBites/](https://aiiyoq.github.io/SecretBites/)
+
+### 本地开发
+
+1. **克隆项目**
+   ```bash
+   git clone https://github.com/aiiyoq/SecretBites.git
+   cd SecretBites
+   ```
+
+2. **配置环境**
+   - 复制 `supabase_config.js.example` 为 `supabase_config.js`
+   - 配置Supabase项目信息
+
+3. **数据库初始化**
+   ```sql
+   -- 执行数据库脚本
+   \i database_schema.sql
+   \i add_friendship_tables.sql
+   ```
+
+4. **启动应用**
+   - 使用本地服务器打开 `index.html`
+   - 或直接访问在线版本
+
+## 📁 项目结构
 
 ```
-myrestaurantmap/
-├── index_friends.html          # 主应用文件
-├── test_supabase.html          # Supabase 连接测试
-├── supabase_config.js          # Supabase 配置文件
-├── database_schema.sql         # 数据库架构
-├── SUPABASE_SETUP_GUIDE.md     # Supabase 设置指南
-└── README.md                   # 项目说明
+SecretBites/
+├── index.html                    # 主应用文件
+├── friendship_api.js             # 好友功能API
+├── supabase_config.js            # Supabase配置
+├── database_schema.sql           # 数据库结构
+├── add_friendship_tables.sql     # 好友功能表
+├── friend_marker_*.svg           # 好友标记图标
+├── README.md                     # 项目说明
+├── PROJECT_DEMO_GUIDE.md         # 演示指南
+├── TECHNICAL_DOCUMENTATION.md    # 技术文档
+└── FRIENDSHIP_DATABASE_DESIGN.md # 数据库设计
 ```
 
-## 快速开始
+## 🎮 使用指南
 
-### 1. 设置 Supabase
+### 基础功能
+1. **用户注册/登录**：创建账户或登录现有账户
+2. **餐厅搜索**：在地图上搜索感兴趣的餐厅
+3. **添加评分**：对餐厅进行个性化评分
+4. **查看好友评分**：浏览好友的餐厅推荐
 
-1. 访问 [supabase.com](https://supabase.com) 创建项目
-2. 在 SQL Editor 中执行 `database_schema.sql` 文件内容
-3. 获取项目 URL 和 API 密钥
+### 高级功能
+1. **好友管理**：添加好友、处理好友请求
+2. **评分筛选**：按评分类型和用户筛选显示
+3. **数据统计**：查看个人评分统计和趋势
+4. **社交分享**：与好友分享美食体验
 
-### 2. 配置应用
+## 🔧 技术特性
 
-编辑 `supabase_config.js` 文件：
+### 前端特性
+- **响应式设计**：适配桌面和移动设备
+- **模块化架构**：清晰的代码组织和模块分离
+- **实时更新**：地图标记与数据实时同步
+- **用户体验优化**：流畅的交互和视觉反馈
 
-```javascript
-const SUPABASE_CONFIG = {
-    URL: 'https://your-project-id.supabase.co',
-    ANON_KEY: 'your-anon-key'
-};
-```
+### 后端特性
+- **云原生架构**：基于Supabase的serverless架构
+- **数据安全**：用户认证和权限控制
+- **实时数据**：支持实时数据同步和更新
+- **扩展性强**：易于扩展新功能和模块
 
-### 3. 配置 RLS 策略
+## 📈 项目亮点
 
-在 Supabase SQL Editor 中执行：
+### 技术创新
+- **AI辅助开发**：利用Cursor AI提高开发效率
+- **GIS深度集成**：充分发挥地理信息系统的优势
+- **全栈独立开发**：从前端到后端的完整技术栈掌握
 
-```sql
--- 启用 RLS
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE restaurant_reviews ENABLE ROW LEVEL SECURITY;
+### 产品创新
+- **真实社交**：基于真实好友关系的评分系统
+- **地图可视化**：直观的地理位置展示
+- **可信推荐**：避免虚假评价的干扰
 
--- 用户表策略
-CREATE POLICY "Users can view all users" ON users FOR SELECT USING (true);
-CREATE POLICY "Users can insert themselves" ON users FOR INSERT WITH CHECK (true);
-CREATE POLICY "Users can update themselves" ON users FOR UPDATE USING (true);
+### 用户体验
+- **简洁直观**：清晰的产品定位和用户界面
+- **功能完整**：覆盖用户核心需求的功能模块
+- **性能优化**：流畅的地图交互和数据加载
 
--- 餐厅点评表策略
-CREATE POLICY "Users can view their own reviews" ON restaurant_reviews FOR SELECT USING (true);
-CREATE POLICY "Users can insert their own reviews" ON restaurant_reviews FOR INSERT WITH CHECK (true);
-CREATE POLICY "Users can update their own reviews" ON restaurant_reviews FOR UPDATE USING (true);
-CREATE POLICY "Users can delete their own reviews" ON restaurant_reviews FOR DELETE USING (true);
-```
 
-### 4. 测试连接
-
-打开 `test_supabase.html` 文件，测试 Supabase 连接和基本功能。
-
-### 5. 运行应用
-
-打开 `index_friends.html` 文件开始使用应用。
-
-## 数据库结构
-
-### users 表
-- `id`: UUID (主键)
-- `nickname`: VARCHAR(50) (昵称)
-- `unique_id`: VARCHAR(20) (唯一标识符)
-- `password_hash`: VARCHAR(255) (密码哈希)
-- `avatar_url`: TEXT (头像URL)
-- `created_at`: TIMESTAMP (创建时间)
-- `last_active`: TIMESTAMP (最后活跃时间)
-
-### restaurant_reviews 表
-- `id`: UUID (主键)
-- `user_id`: UUID (用户ID，外键)
-- `restaurant_uid`: VARCHAR(100) (餐厅唯一ID)
-- `restaurant_name`: VARCHAR(200) (餐厅名称)
-- `restaurant_address`: TEXT (餐厅地址)
-- `restaurant_city`: VARCHAR(100) (城市)
-- `restaurant_area`: VARCHAR(100) (区域)
-- `rating`: VARCHAR(20) (评分等级)
-- `review_text`: TEXT (点评文字)
-- `latitude`: DECIMAL(10,8) (纬度)
-- `longitude`: DECIMAL(11,8) (经度)
-- `tags`: TEXT[] (标签数组)
-- `is_public`: BOOLEAN (是否公开)
-- `created_at`: TIMESTAMP (创建时间)
-- `updated_at`: TIMESTAMP (更新时间)
-
-## 使用说明
-
-### 用户注册/登录
-1. 点击右上角的"注册"或"登录"按钮
-2. 填写相应信息完成注册或登录
-3. 登录后可以开始使用评分功能
-
-### 餐厅搜索
-1. 在顶部搜索框输入餐厅名称
-2. 点击搜索按钮或按回车键
-3. 搜索结果会显示在右侧信息面板中
-
-### 餐厅评分
-1. 点击搜索结果中的餐厅或地图上的标记
-2. 在餐厅详情页面选择评分等级
-3. 评分会自动保存到数据库
-
-### 查看评分
-1. 点击地图空白处显示评分列表
-2. 使用筛选器查看不同等级的评分
-3. 点击统计按钮查看评分统计
-
-## 安全注意事项
-
-1. **密码安全**: 当前使用明文存储密码，生产环境应使用 bcrypt 等哈希算法
-2. **API 密钥**: 不要将 API 密钥提交到公共代码仓库
-3. **RLS 策略**: 确保正确配置行级安全策略
-4. **数据验证**: 在应用层添加输入验证
-
-## 扩展建议
-
-1. **密码哈希**: 集成 bcrypt 进行密码加密
-2. **图片上传**: 添加用户头像和餐厅照片功能
-3. **好友系统**: 实现用户好友关系
-4. **实时通知**: 使用 Supabase Realtime 实现实时功能
-5. **离线支持**: 使用 Service Worker 实现离线功能
-6. **数据备份**: 定期备份数据库数据
-
-## 故障排除
-
-### 常见问题
-
-1. **连接错误**: 检查 Supabase URL 和 API 密钥是否正确
-2. **权限错误**: 确认 RLS 策略配置正确
-3. **数据不显示**: 检查用户是否已登录
-4. **评分保存失败**: 检查网络连接和数据库权限
-
-### 调试方法
-
-1. 打开浏览器开发者工具查看控制台错误
-2. 检查 Supabase 仪表板中的日志
-3. 使用 `console.log()` 调试数据流
-4. 验证数据库表结构和数据
-
-## 许可证
-
-MIT License
-
-## 贡献
-
-欢迎提交 Issue 和 Pull Request！ 
+**SecretBites** - 让美食探索更有意义，让分享更加真实！ 🍕🍜🍣 
