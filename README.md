@@ -84,6 +84,7 @@
 
 ### 在线体验
 **产品链接**：[https://aiiyoq.github.io/SecretBites/](https://aiiyoq.github.io/SecretBites/)
+**体验账号**：ID：wangyuqing；密码：111111
 
 ### 本地开发
 
