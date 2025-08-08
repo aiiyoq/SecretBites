@@ -18,6 +18,8 @@
 
 ## 🛠️ 技术实现
 
+**技术文档**：https://deepwiki.com/aiiyoq/SecretBites
+
 ### 技术架构
 - **前端技术栈**：HTML5 + CSS3 + JavaScript ES6+
 - **后端服务**：Supabase云服务 + PostgreSQL数据库
@@ -82,6 +84,7 @@
 
 ### 在线体验
 **产品链接**：[https://aiiyoq.github.io/SecretBites/](https://aiiyoq.github.io/SecretBites/)
+**体验账号**：ID：wangyuqing；密码：111111
 
 ### 本地开发
 
@@ -115,7 +118,6 @@ SecretBites/
 ├── supabase_config.js            # Supabase配置
 ├── database_schema.sql           # 数据库结构
 ├── add_friendship_tables.sql     # 好友功能表
-├── friend_marker_*.svg           # 好友标记图标
 ├── README.md                     # 项目说明
 ├── PROJECT_DEMO_GUIDE.md         # 演示指南
 ├── TECHNICAL_DOCUMENTATION.md    # 技术文档
