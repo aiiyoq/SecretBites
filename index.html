@@ -704,6 +704,97 @@
             background: #34ce57;
         }
         
+        /* 欢迎弹窗样式 */
+        .welcome-content {
+            text-align: center;
+        }
+        
+        .welcome-intro {
+            margin-bottom: 20px;
+        }
+        
+        .welcome-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .welcome-btn {
+            width: 100%;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .welcome-btn.primary {
+            background: #ffc107;
+            color: #000;
+        }
+        
+        .welcome-btn.primary:hover {
+            background: #e0a800;
+        }
+        
+        .welcome-btn.secondary {
+            background: #1b8eec;
+            color: #fff;
+        }
+        
+        .welcome-btn.secondary:hover {
+            background: #156bbd;
+        }
+        
+        .welcome-btn.tertiary {
+            background: #28a745;
+            color: #fff;
+        }
+        
+        .welcome-btn.tertiary:hover {
+            background: #218838;
+        }
+        
+        .demo-account-info {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .demo-account-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .demo-account-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .demo-label {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        .demo-value {
+            font-size: 14px;
+            color: #333;
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            background: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        
         /* 认证模态框样式 */
         .auth-modal {
             display: none;
@@ -1245,6 +1336,48 @@
         </div>
     </div>
     
+    <!-- 欢迎弹窗 -->
+    <div class="auth-modal" id="welcome-modal">
+        <div class="auth-modal-content" style="max-width: 400px;">
+            <div class="auth-modal-header">
+                <h2>欢迎使用 SecretBites</h2>
+                <button class="auth-modal-close" id="welcome-modal-close">&times;</button>
+            </div>
+            <div class="auth-modal-body">
+                <div class="welcome-content">
+                    <div class="welcome-intro">
+                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px; color: #333;">
+                            可以使用演示账号，查看我的心选餐厅
+                        </p>
+                    </div>
+                    
+                    <div class="demo-account-info">
+                        <div class="demo-account-item">
+                            <span class="demo-label">账号：</span>
+                            <span class="demo-value">wangyuqing</span>
+                        </div>
+                        <div class="demo-account-item">
+                            <span class="demo-label">密码：</span>
+                            <span class="demo-value">111111</span>
+                        </div>
+                    </div>
+                    
+                    <div class="welcome-actions">
+                        <button class="welcome-btn primary" onclick="useDemoAccount()">
+                            使用演示账号
+                        </button>
+                        <button class="welcome-btn secondary" onclick="showModal('login-modal'); hideModal('welcome-modal');">
+                            登录
+                        </button>
+                        <button class="welcome-btn tertiary" onclick="showModal('register-modal'); hideModal('welcome-modal');">
+                            注册
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 好友管理模态框 -->
     <div class="auth-modal" id="friends-modal">
         <div class="auth-modal-content" style="max-width: 600px;">
@@ -1600,6 +1733,72 @@
         function switchModal(fromModalId, toModalId) {
             hideModal(fromModalId);
             showModal(toModalId);
+        }
+        
+        // 显示欢迎弹窗
+        window.showWelcomeModal = function() {
+            showModal('welcome-modal');
+        }
+        
+        // 使用演示账号自动登录
+        window.useDemoAccount = async function() {
+            try {
+                // 显示加载状态
+                const demoBtn = event.target;
+                const originalText = demoBtn.textContent;
+                demoBtn.textContent = '登录中...';
+                demoBtn.disabled = true;
+                
+                // 使用演示账号信息
+                const demoCredentials = {
+                    unique_id: 'wangyuqing',
+                    password: '111111'
+                };
+                
+                // 调用现有的登录函数
+                const user = await loginUser(demoCredentials.unique_id, demoCredentials.password);
+                
+                // 设置用户会话
+                currentUser = user;
+                isLoggedIn = true;
+                saveUserSession(user);
+                
+                // 关闭欢迎弹窗
+                hideModal('welcome-modal');
+                
+                // 更新UI状态
+                updateUserStatusUI();
+                
+                // 更新用户筛选状态
+                userFilterState = { self: true };
+                userFilterMapping = { self: currentUser.id };
+                
+                // 初始化好友API
+                initFriendshipAPI();
+                
+                // 加载评分数据
+                await loadRatedPois();
+                await updateUserFilters(); // 更新用户筛选器
+                updateFilterState();
+                updateMapMarkers();
+                updateMapViewportForRatedPois();
+                updateInfoPanel(null, 'list'); // 更新信息面板显示餐厅列表
+                
+                // 显示成功消息
+                setTimeout(() => {
+                    alert('演示账号登录成功！欢迎查看我的心选餐厅 🍽️');
+                }, 500);
+                
+            } catch (error) {
+                console.error('演示账号登录失败:', error);
+                
+                // 恢复按钮状态
+                demoBtn.textContent = originalText;
+                demoBtn.disabled = false;
+                
+                // 显示错误消息
+                alert('演示账号登录失败：' + error.message);
+            }
         }
 
         async function loadRatedPois() {
@@ -2441,6 +2640,10 @@
                 hideModal('register-modal');
             });
             
+            document.getElementById('welcome-modal-close').addEventListener('click', () => {
+                hideModal('welcome-modal');
+            });
+            
             // 模态框背景点击关闭
             document.getElementById('login-modal').addEventListener('click', (e) => {
                 if (e.target.id === 'login-modal') {
@@ -2451,6 +2654,12 @@
             document.getElementById('register-modal').addEventListener('click', (e) => {
                 if (e.target.id === 'register-modal') {
                     hideModal('register-modal');
+                }
+            });
+            
+            document.getElementById('welcome-modal').addEventListener('click', (e) => {
+                if (e.target.id === 'welcome-modal') {
+                    hideModal('welcome-modal');
                 }
             });
             
@@ -3491,16 +3700,11 @@
             // 确保信息面板默认展开显示
             document.getElementById('info-panel').classList.remove('collapsed');
             
-            // 如果用户未登录，显示登录提示
+            // 如果用户未登录，显示欢迎弹窗
             if (!isLoggedIn) {
                 setTimeout(() => {
-                    const panelContent = document.getElementById('info-panel-content');
-                    const loginTipDiv = document.createElement('div');
-                    loginTipDiv.style.cssText = 'background: #fff3cd; color: #856404; padding: 12px; border-radius: 6px; margin-bottom: 16px; text-align: center;';
-                    loginTipDiv.innerHTML = '请先 <button onclick="showModal(\'login-modal\')" style="background: #1b8eec; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 0 4px;">登录</button> 或 <button onclick="showModal(\'register-modal\')" style="background: #28a745; color: #fff; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; margin: 0 4px;">注册</button> 后才能进行评分操作。';
-                    panelContent.insertBefore(loginTipDiv, panelContent.firstChild);
-                    setTimeout(() => loginTipDiv.remove(), 8000);
-                }, 1000);
+                    showWelcomeModal();
+                }, 500);
             }
             
             // 在控制台显示辅助函数
