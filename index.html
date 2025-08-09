@@ -3367,6 +3367,9 @@
                 const rateBtns = panelContent.querySelectorAll('.rate-btn');
                 const removeBtn = panelContent.querySelector('#remove-rate-btn');
                 
+                // 记录当前面板状态
+                window.lastPanel = 'search-result-panel';
+                
                 rateBtns.forEach(btn => {
                     btn.onclick = async function() {
                         if (!isLoggedIn) {
@@ -3630,12 +3633,14 @@
         };
         
         window.goBackFromDetail = function() {
-            // 根据之前的视图决定返回到哪里
-            if (previousView === 'search' && currentSearchResults.length > 0) {
+            // 根据lastPanel状态决定返回到哪里
+            if (window.lastPanel === 'search-result-panel' && currentSearchResults.length > 0) {
                 updateInfoPanel(null, 'search', currentSearchResults);
             } else {
                 updateInfoPanel(null, 'list');
             }
+            // 清除lastPanel状态
+            window.lastPanel = null;
         };
         
         window.loadMoreSearchResults = function() {
