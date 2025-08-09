@@ -1346,8 +1346,9 @@
             <div class="auth-modal-body">
                 <div class="welcome-content">
                     <div class="welcome-intro">
-                        <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px; color: #333;">
-                            可以使用演示账号，查看我的心选餐厅
+                        <p style="font-size: 16px; line-height: 1.6; margin: -10px 0 20px; color: #333;">
+                            可以使用演示账号，查看我的心选餐厅；<br>
+                            也可以查看项目介绍，了解产品诞生的0到1
                         </p>
                     </div>
                     
@@ -1363,6 +1364,9 @@
                     </div>
                     
                     <div class="welcome-actions">
+                        <button class="welcome-btn" onclick="downloadProjectIntro()">
+                            项目介绍（PDF）
+                        </button>
                         <button class="welcome-btn primary" onclick="useDemoAccount()">
                             使用演示账号
                         </button>
@@ -1735,6 +1739,22 @@
             showModal(toModalId);
         }
         
+        // 下载项目介绍 PDF（放在项目根目录）
+        window.downloadProjectIntro = function() {
+            const pdfPath = encodeURI('王雨晴_SecretBites_把最爱的餐厅，分享给最亲密的朋友_产品介绍.pdf');
+            try {
+                const a = document.createElement('a');
+                a.href = pdfPath;
+                a.download = 'SecretBites_产品介绍.pdf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } catch (e) {
+                // 回退方案：新开标签页
+                window.open(pdfPath, '_blank');
+            }
+        }
+
         // 显示欢迎弹窗
         window.showWelcomeModal = function() {
             showModal('welcome-modal');
